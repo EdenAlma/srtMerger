@@ -1,11 +1,7 @@
-import fs from 'fs/promises'
-
-
 export class srtCombine {
-
+    
 
     static async getCombinedSrt(srt_1, srt_2) {
-
         const enJSON = await srtCombine.srtToJSON(srt_1, 'en')
         const esJSON = await srtCombine.srtToJSON(srt_2, 'es')
         let comboArray = enJSON.concat(esJSON);
@@ -14,8 +10,8 @@ export class srtCombine {
 
     }
 
-    static async getStrText (path){
-        const data = await fs.readFile(path);
+    static async getStrText (file){
+        const data = await file.text();
         return data.toString();
     }
 

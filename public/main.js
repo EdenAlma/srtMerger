@@ -6,14 +6,13 @@ var srtData = [];
 mergeBtn.addEventListener('click', async () => {
   const srt1File = document.getElementById("srt1").files[0];
   const srt2File = document.getElementById("srt2").files[0];
+  const thresh = document.getElementById('threshold').value;
   srtData = await srtCombine.getCombinedSrt(srt1File, srt2File);
-  renderSrt(srtData);
-  document.getElementById("srtContainer").addEventListener("click", function(event) {
-    // Check if the clicked element (event.target) has the class 'box'
-    if (event.target) {
-        alert("You clicked on " + event.target.id);
-    }
-});
+  const root = document.documentElement;
+  root.style.setProperty('--extend', thresh + 'px');
+  renderSrt(srtData, thresh);
+  addPostRenderEvents();
+
 })
 
 
@@ -30,7 +29,7 @@ function renderSrt(cues) {
     if (element.lang != realtiveStartLang) {
       realtiveStart2 = element.startTime;
       break;
-    }else{
+    } else {
       index++;
     }
   }
@@ -50,11 +49,23 @@ function renderSrt(cues) {
     `;
 
     if (cue.lang === 'en') {
+      div.classList.add('left-cue');
       left.appendChild(div);
     } else {
+      div.classList.add('right-cue');
       right.appendChild(div);
     }
 
   }
-
 }
+
+function addPostRenderEvents() {
+  document.getElementById("srtContainer").addEventListener("click", function (event) {
+    // Check if the clicked element (event.target) has the class 'box'
+    if (event.target) {
+      alert("You clicked on " + event.target.id);
+    }
+  });
+}
+
+

@@ -1,0 +1,19 @@
+#srtContainer {
+    display: flex;
+}
+
+#left{
+    position: relative;
+    width: 50%;
+}
+
+
+#right{
+    position: relative;
+    width: 50%;
+}
+
+.cue{
+    position: absolute;
+    border-style: solid;
+}

@@ -41,7 +41,7 @@ export class srtCombine {
             item.lang = lang
             item.seq = block[0]
             let i = 2
-            let rawText = ''
+            let rawText = '';
             let containsBreak = false;
             while (block[i]) {
                 rawText += ((i > 2) ? '\n' : '') + block[i]

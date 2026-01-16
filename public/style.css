@@ -20,4 +20,6 @@
 .cue {
     position: absolute;
     border-style: solid;
+    resize: vertical;
+    overflow: auto;
 }

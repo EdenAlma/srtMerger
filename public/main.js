@@ -46,17 +46,21 @@ function renderSrt(cues) {
 }
 
 function addPostRenderEvents() {
-  document.getElementById("srtContainer").addEventListener("click", function (event) {
+  /*document.getElementById("srtContainer").addEventListener("click", function (event) {
     // Check if the clicked element (event.target) has the class 'box'
     if (event.target) {
       alert("You clicked on " + event.target.id);
     }
-  });
+  });*/
 
     document.getElementById("srtContainer").addEventListener("dragend", function (event) {
     // Check if the clicked element (event.target) has the class 'box'
     updateCuePosition(event)
   });
+
+  const cues = document.querySelectorAll('.cue');
+  cues.forEach(cue => observer.observe(cue));
+
 }
 
 
@@ -70,5 +74,14 @@ function updateCuePosition(e) {
   cueToUpdate.startTime = y*100;
   cueToUpdate.endTime = cueToUpdate.startTime + cueToUpdate.duration;
 
-
 }
+
+
+// Create a single ResizeObserver instance
+const observer = new ResizeObserver(entries => {
+  for (let entry of entries) {
+    const { width, height } = entry.contentRect;
+    console.log(`Resized ${entry.target.id}: ${width}px × ${height}px`);
+  }
+});
+

@@ -21,26 +21,3 @@
     position: absolute;
     border-style: solid;
 }
-
-
-.cue::after {
-    content: "";
-    position: absolute;
-    inset: calc(-1 * var(--extend));
-    background: rgba(0, 0, 0, 0.15);
-    pointer-events: none;
-    width: 100vw;
-    /* ignore parent's width */
-}
-
-
-/* group1 background color */
-.cue.left-cue::after {
-  background: rgba(216, 236, 31, 0.514); /* red-ish overlay */
-}
-
-/* group2 background color */
-.cue.right-cue::after {
-  left: 0;
-  background: rgba(40, 228, 3, 0.39); /* blue-ish overlay */
-}

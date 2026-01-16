@@ -1,17 +1,17 @@
 import { srtCombine } from "./srtCombine.js"
 
 const mergeBtn = document.getElementById('mergeBtn');
-var srtData = [];
+window.srtData = [];
 
 mergeBtn.addEventListener('click', async () => {
   const srt1File = document.getElementById("srt1").files[0];
   const srt2File = document.getElementById("srt2").files[0];
   const thresh = document.getElementById('threshold').value;
   srtData = await srtCombine.getCombinedSrt(srt1File, srt2File);
-  const root = document.documentElement;
-  root.style.setProperty('--extend', thresh + 'px');
+  //const root = document.documentElement;
+  //root.style.setProperty('--extend', thresh + 'px');
   renderSrt(srtData, thresh);
-  addPostRenderEvents();
+  
 
 })
 
@@ -20,43 +20,29 @@ function renderSrt(cues) {
   const left = document.getElementById("left");
   const right = document.getElementById("right");
 
-  const relativeStart = cues[0].startTime;
-  const realtiveStartLang = cues[0].lang;
-  let realtiveStart2;
-  let index = 0
-  while (true) {
-    let element = cues[index]
-    if (element.lang != realtiveStartLang) {
-      realtiveStart2 = element.startTime;
-      break;
-    } else {
-      index++;
-    }
-  }
-
-
-
   for (const cue of cues) {
     const div = document.createElement("div");
     div.className = "cue";
     div.id = `${cue.seq}-${cue.lang}`
-    div.style.top = (cue.startTime - relativeStart) / 100 + 'px';
+    div.style.top = (cue.startTime) / 100 + 'px';
     div.style.height = cue.duration / 100 + 'px';
     div.draggable = true;
-    div.contentEditable = true;
+    //div.contentEditable = true;
     div.innerHTML = `
       <span class="id">${cue.rawText}</span>
     `;
 
     if (cue.lang === 'en') {
-      div.classList.add('left-cue');
+      //div.classList.add('left-cue');
       left.appendChild(div);
     } else {
-      div.classList.add('right-cue');
+      //div.classList.add('right-cue');
       right.appendChild(div);
     }
 
   }
+
+  addPostRenderEvents();
 }
 
 function addPostRenderEvents() {
@@ -66,6 +52,23 @@ function addPostRenderEvents() {
       alert("You clicked on " + event.target.id);
     }
   });
+
+    document.getElementById("srtContainer").addEventListener("dragend", function (event) {
+    // Check if the clicked element (event.target) has the class 'box'
+    updateCuePosition(event)
+  });
 }
 
 
+function updateCuePosition(e) {
+  const cue = e.target;
+  const container = cue.offsetParent; // nearest positioned ancestor
+  const rect = container.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  cue.style.top = `${y}px`;
+  const cueToUpdate = srtData.find(element => element.seq + '-' + element.lang === e.target.id)
+  cueToUpdate.startTime = y*100;
+  cueToUpdate.endTime = cueToUpdate.startTime + cueToUpdate.duration;
+
+
+}

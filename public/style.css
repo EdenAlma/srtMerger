@@ -2,6 +2,11 @@
     --extend: 0;
 }
 
+body {
+  user-select: none;
+}
+
+
 #srtContainer {
     display: flex;
 }
@@ -20,6 +25,32 @@
 .cue {
     position: absolute;
     border-style: solid;
-    resize: vertical;
-    overflow: auto;
+    overflow: hidden;
+    width: 85%;
+}
+
+
+
+
+.cue-text {
+    position: absolute;
+    top:0;
+    height: 90%;
+}
+
+:hover .cue-text{
+    cursor: move;
+}
+
+.resize-handle {
+    background: linear-gradient(black, white);
+    position: absolute;
+    bottom:0;
+    width: 100%;
+    height: 10%;
+    max-height: 10px;
+}
+
+:hover .resize-handle{
+    cursor: n-resize;
 }

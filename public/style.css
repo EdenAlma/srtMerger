@@ -3,7 +3,7 @@
 }
 
 body {
-  user-select: none;
+    user-select: none;
 }
 
 
@@ -25,34 +25,52 @@ body {
 .cue {
     position: absolute;
     border-style: solid;
-    overflow: hidden;
+    overflow: visible;
     width: 85%;
 }
 
-.selected{
+:hover .cue{
+    cursor: move;
+}
+
+.selected {
     box-shadow: -6px -6px 10px rgba(0, 0, 0, 0.4) inset, 6px 6px 10px rgba(0, 0, 0, 0.4) inset;
 }
 
 
 .cue-text {
     position: absolute;
-    top:0;
+    top: 0;
     height: 90%;
 }
 
-:hover .cue-text{
-    cursor: move;
+:hover .cue{
+
 }
 
 .resize-handle {
     background: linear-gradient(black, white);
     position: absolute;
-    bottom:0;
+    bottom: 0;
     width: 100%;
     height: 10%;
     max-height: 10px;
 }
 
-:hover .resize-handle{
+.action-button {
+    background-color: black;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 10%;
+    height: 20px;
+    border-radius: 10px;
+}
+
+.hidden{
+    visibility: hidden;
+}
+
+:hover .resize-handle {
     cursor: n-resize;
 }

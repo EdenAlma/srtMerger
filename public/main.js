@@ -11,13 +11,13 @@ mergeBtn.addEventListener('click', async () => {
   srtData = await srtCombine.getCombinedSrt(srt1File, srt2File);
   //const root = document.documentElement;
   //root.style.setProperty('--extend', thresh + 'px');
-  renderSrt(srtData, thresh);
+  renderSrtInit(srtData, thresh);
 
 
 })
 
 
-function renderSrt(cues) {
+function renderSrtInit(cues) {
   const left = document.getElementById("left");
   const right = document.getElementById("right");
 
@@ -32,6 +32,7 @@ function renderSrt(cues) {
     div.innerHTML = `
       <span class="cue-text">${cue.rawText}</span>
       <div class="resize-handle"></div>
+      <div class="action-button hidden"></div>
     `;
 
     if (cue.lang === 'en') {

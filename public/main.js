@@ -48,23 +48,7 @@ function renderSrt(cues) {
 }
 
 function addPostRenderEvents() {
-  /*document.getElementById("srtContainer").addEventListener("click", function (event) {
-    // Check if the clicked element (event.target) has the class 'box'
-    if (event.target) {
-      alert("You clicked on " + event.target.id);
-    }
-  });*/
-
-  /*document.getElementById("srtContainer").addEventListener("mousedown", function (event) {
-    
-    
-    //updateCuePosition(event)
-  });*/
-
-
   document.getElementById("srtContainer").addEventListener("mousedown", onMouseDown);
-
-
 }
 
 
@@ -78,13 +62,12 @@ function updateCuePosition(evt, elm, dOff) {
 
 }
 
-function updateCueSize(evt,elm){
+function updateCueSize(evt, elm) {
   const clickedElement = elm.closest('.cue')
   const container = clickedElement.offsetParent; // nearest positioned ancestor
   const rect = container.getBoundingClientRect();
   const y = evt.clientY
   clickedElement.style.height = (y - (parseInt(clickedElement.style.top) + rect.top)) + 'px'
-  console.log(clickedElement.style.height)
   const cueToUpdate = srtData.find(element => element.seq + '-' + element.lang === clickedElement.id)
   cueToUpdate.endTime = y * 60;
   cueToUpdate.duration = cueToUpdate.endTime - cueToUpdate.startTime;
@@ -95,25 +78,23 @@ let mouseMoveHandler;
 
 function onMouseDown(event) {
   // Check if the clicked element (event.target) has the class 'box'
-  console.log('down')
   const clickedElement = event.target;
   const clickedCue = event.target.closest('.cue');
   const clickYPosition = event.clientY
 
-  if (!clickedElement) return
-  let divOffset = parseInt(clickedCue.style.top) - clickYPosition;
-  selectedElements.push(clickedCue); //add to some sort of array incase its not a drag or resize (select)
-  mouseUpHandler = (event) => onMouseUp(event, clickedElement, clickYPosition)
-  mouseMoveHandler = (event) => onMouseMove(event, clickedElement, divOffset)
+  if (clickedElement) {
+    let divOffset = parseInt(clickedCue.style.top) - clickYPosition;
+    mouseUpHandler = (event) => onMouseUp(event, clickedElement, clickYPosition)
+    mouseMoveHandler = (event) => onMouseMove(event, clickedElement, divOffset)
+  }
   window.addEventListener('mousemove', mouseMoveHandler)
   window.addEventListener('mouseup', mouseUpHandler)
 }
 
 function onMouseUp(event, initialClickedElm, initialClickedPos) {
-  console.log('up')
   let unclickedElement = event.target.closest('.cue');
   if (!unclickedElement) unclickedElement = initialClickedElm
-  if (event.clientY === initialClickedPos) { console.log('real click') }
+  if (event.clientY === initialClickedPos) { handleSingleClick(unclickedElement) }
 
   window.removeEventListener('mousemove', mouseMoveHandler)
   window.removeEventListener('mouseup', mouseUpHandler)
@@ -121,10 +102,21 @@ function onMouseUp(event, initialClickedElm, initialClickedPos) {
 
 function onMouseMove(event, initialClicked, divOffset) {
   const clickedCue = initialClicked.closest('.cue');
-  if(initialClicked.className == 'resize-handle'){
-    console.log('size update')
+  if (initialClicked.className == 'resize-handle') {
     updateCueSize(event, initialClicked)
-  }else{
+  } else {
     updateCuePosition(event, clickedCue, divOffset)
   }
+}
+
+function handleSingleClick(element) {
+  const findElementIndex = selectedElements.findIndex(e => element.id === e.id)
+  if(findElementIndex >= 0){
+    selectedElements.splice(findElementIndex)
+    element.classList.remove('selected')
+  }else{
+    selectedElements.push(element)
+    element.classList.add('selected')
+  }
+
 }

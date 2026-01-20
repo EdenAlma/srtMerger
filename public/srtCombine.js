@@ -55,6 +55,7 @@ export class srtCombine {
             item.startTime = srtCombine.parseSrtTime(block[1].split(' --> ')[0])
             item.endTime = srtCombine.parseSrtTime(block[1].split(' --> ')[1])
             item.duration = item.endTime - item.startTime
+            item.matched = false;
             return item
         })
 

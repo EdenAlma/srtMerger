@@ -13,12 +13,14 @@ body {
 
 #left {
     position: relative;
+    font-family: cursive;
     width: 50%;
 }
 
 
 #right {
     position: relative;
+    font-family: sans-serif;
     width: 50%;
 }
 
@@ -27,6 +29,10 @@ body {
     border-style: solid;
     overflow: visible;
     width: 85%;
+}
+
+.matched{
+    background-color: greenyellow;
 }
 
 :hover .cue{
@@ -44,9 +50,6 @@ body {
     height: 90%;
 }
 
-:hover .cue{
-
-}
 
 .resize-handle {
     background: linear-gradient(black, white);

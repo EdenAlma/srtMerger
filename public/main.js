@@ -1,19 +1,25 @@
 import { srtCombine } from "./srtCombine.js"
 
 const mergeBtn = document.getElementById('mergeBtn');
+const alignBtn = document.getElementById('alignBtn');
 window.srtData = [];
+window.thresh = 0;
 var selectedElements = [];
 
 mergeBtn.addEventListener('click', async () => {
   const srt1File = document.getElementById("srt1").files[0];
   const srt2File = document.getElementById("srt2").files[0];
-  const thresh = document.getElementById('threshold').value;
+  
   srtData = await srtCombine.getCombinedSrt(srt1File, srt2File);
   //const root = document.documentElement;
   //root.style.setProperty('--extend', thresh + 'px');
-  renderSrtInit(srtData, thresh);
+  renderSrtInit(srtData);
 
+})
 
+alignBtn.addEventListener('click', () => {
+  thresh = parseInt(document.getElementById('threshold').value);
+  alignAllCues(srtData)
 })
 
 
@@ -35,6 +41,9 @@ function renderSrtInit(cues) {
       <div class="action-button hidden"></div>
     `;
 
+    if(cue.matched){
+      div.classList.add('matched')
+    }
     if (cue.lang === 'en') {
       //div.classList.add('left-cue');
       left.appendChild(div);
@@ -46,6 +55,59 @@ function renderSrtInit(cues) {
   }
 
   addPostRenderEvents();
+}
+
+function alignAllCues(cues){
+  for (let i=0; i<cues.length; i++) {
+    let j = i
+    let nextPossibleMatch = cues[j]
+    let current = cues[i]
+    while(nextPossibleMatch && current.lang == nextPossibleMatch.lang){
+      j++;
+      nextPossibleMatch = cues[j]
+    }
+    
+    if(nextPossibleMatch){
+      if(isMatch(current,nextPossibleMatch, thresh)){
+        alignCues(current,nextPossibleMatch)
+      }else{
+        continue;
+      }
+    }else{
+      break;
+    }
+  }
+
+  clearDom();
+  renderSrtInit(cues);
+}
+
+function alignCues(a,b){
+  let start = Math.min(a.startTime,b.startTime)
+  let end = Math.max(a.endTime, b.endTime)
+  let duration = end - start;
+  a.startTime = start;
+  b.startTime = start;
+  a.endTime = end;
+  b.endTime = end;
+  a.duration = duration;
+  b.duration = duration;
+  a.matched = true;
+  b.matched = true;
+}
+
+
+function isMatch(a,b){
+  let startDiff = Math.abs(a.startTime - b.startTime);
+  let endDiff = Math.abs(a.endTime - b.endTime);
+  return (startDiff < thresh && endDiff < thresh);
+}
+
+function clearDom(){
+  const left = document.getElementById("left");
+  const right = document.getElementById("right");
+  left.innerHTML = '';
+  right.innerHTML = '';
 }
 
 function addPostRenderEvents() {
@@ -70,7 +132,7 @@ function updateCueSize(evt, elm) {
   const y = evt.clientY
   clickedElement.style.height = (y - (parseInt(clickedElement.style.top) + rect.top)) + 'px'
   const cueToUpdate = srtData.find(element => element.seq + '-' + element.lang === clickedElement.id)
-  cueToUpdate.endTime = y * 60;
+  cueToUpdate.endTime = (y-rect.top) * 60 ;
   cueToUpdate.duration = cueToUpdate.endTime - cueToUpdate.startTime;
 }
 
@@ -95,10 +157,16 @@ function onMouseDown(event) {
 function onMouseUp(event, initialClickedElm, initialClickedPos) {
   let unclickedElement = event.target.closest('.cue');
   if (!unclickedElement) unclickedElement = initialClickedElm
-  if (event.clientY === initialClickedPos) { handleSingleClick(unclickedElement) }
+  if (event.clientY === initialClickedPos) { 
+    handleSingleClick(unclickedElement) 
+    window.removeEventListener('mousemove', mouseMoveHandler)
+    window.removeEventListener('mouseup', mouseUpHandler)
+    return
+  }
 
   window.removeEventListener('mousemove', mouseMoveHandler)
   window.removeEventListener('mouseup', mouseUpHandler)
+  alignAllCues(srtData);
 }
 
 function onMouseMove(event, initialClicked, divOffset) {

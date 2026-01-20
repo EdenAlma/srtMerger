@@ -56,6 +56,7 @@ export class srtCombine {
             item.endTime = srtCombine.parseSrtTime(block[1].split(' --> ')[1])
             item.duration = item.endTime - item.startTime
             item.matched = false;
+            item.id = crypto.randomUUID();
             return item
         })
 

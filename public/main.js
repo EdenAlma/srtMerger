@@ -30,11 +30,9 @@ function renderSrtInit(cues) {
   for (const cue of cues) {
     const div = document.createElement("div");
     div.className = "cue";
-    div.id = `${cue.seq}-${cue.lang}`
+    div.id = `${cue.id}`
     div.style.top = (cue.startTime) / 60 + 'px';
     div.style.height = cue.duration / 60 + 'px';
-    //div.draggable = true;
-    //div.contentEditable = true;
     div.innerHTML = `
       <span class="cue-text">${cue.rawText}</span>
       <div class="resize-handle"></div>
@@ -43,6 +41,8 @@ function renderSrtInit(cues) {
 
     if(cue.matched){
       div.classList.add('matched')
+    }else{
+      div.classList.remove('matched')
     }
     if (cue.lang === 'en') {
       //div.classList.add('left-cue');
@@ -119,7 +119,7 @@ function updateCuePosition(evt, elm, dOff) {
 
   const y = evt.clientY + dOff;
   elm.style.top = `${y}px`;
-  const cueToUpdate = srtData.find(element => element.seq + '-' + element.lang === elm.id)
+  const cueToUpdate = srtData.find(element => element.id === elm.id)
   cueToUpdate.startTime = y * 60;
   cueToUpdate.endTime = cueToUpdate.startTime + cueToUpdate.duration;
 
@@ -131,7 +131,7 @@ function updateCueSize(evt, elm) {
   const rect = container.getBoundingClientRect();
   const y = evt.clientY
   clickedElement.style.height = (y - (parseInt(clickedElement.style.top) + rect.top)) + 'px'
-  const cueToUpdate = srtData.find(element => element.seq + '-' + element.lang === clickedElement.id)
+  const cueToUpdate = srtData.find(element => element.id === clickedElement.id)
   cueToUpdate.endTime = (y-rect.top) * 60 ;
   cueToUpdate.duration = cueToUpdate.endTime - cueToUpdate.startTime;
 }

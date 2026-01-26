@@ -2,8 +2,8 @@ export class srtCombine {
     
 
     static async getCombinedSrt(srt_1, srt_2) {
-        const enJSON = await srtCombine.srtToJSON(srt_1, 'en')
-        const esJSON = await srtCombine.srtToJSON(srt_2, 'es')
+        const enJSON = await srtCombine.srtToJSON(srt_1, 'left')
+        const esJSON = await srtCombine.srtToJSON(srt_2, 'right')
         let comboArray = enJSON.concat(esJSON);
         comboArray.sort((a, b) => { return a.startTime - b.startTime })
         return comboArray
@@ -28,7 +28,7 @@ export class srtCombine {
         );
     }
 
-    static async srtToJSON(path, lang){
+    static async srtToJSON(path, side){
 
         const fileString = await srtCombine.getStrText(path);
         const tagPattern = new RegExp("<[a-z]{1}>|</[a-z]{1}>", "g")
@@ -38,7 +38,7 @@ export class srtCombine {
 
             let block = record.split('\r\n')
             let item = {}
-            item.lang = lang
+            item.side = side
             item.seq = block[0]
             let i = 2
             let rawText = '';

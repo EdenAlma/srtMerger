@@ -19,8 +19,9 @@ function renderCue(cue) {
     div.style.top = (cue.startTime) / 60 + 'px';
     div.style.height = cue.duration / 60 + 'px';
     div.innerHTML = `
+      <div class="resize-handle top-handle"></div>
       <span class="cue-text">${cue.rawText}</span>
-      <div class="resize-handle"></div>
+      <div class="resize-handle bottom-handle"></div>
       <div class="action-button hidden"></div>
     `;
 

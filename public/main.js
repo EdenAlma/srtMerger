@@ -1,13 +1,11 @@
 import { srtCombine } from "./srtCombine.js"
 import { addEvents } from "./events.js"
 import { renderSrt } from "./render.js";
+import { srtData,selectedElements,thresh } from "./model.js";
 
 const mergeBtn = document.getElementById('mergeBtn');
 const alignBtn = document.getElementById('alignBtn');
-const srtData = [];
-const selectedElements  = []
-let thresh = 0;
-const state = {srtData, thresh, selectedElements}
+
 
 mergeBtn.addEventListener('click', async () => {
   const srt1File = document.getElementById("srt1").files[0];
@@ -20,38 +18,7 @@ mergeBtn.addEventListener('click', async () => {
   addEvents();
 })
 
-/*alignBtn.addEventListener('click', () => {
-  thresh = parseInt(document.getElementById('threshold').value);
-  alignAllCues(srtData)
-})
 
-
-
-
-function alignAllCues(cues){
-  for (let i=0; i<cues.length; i++) {
-    let j = i
-    let nextPossibleMatch = cues[j]
-    let current = cues[i]
-    while(nextPossibleMatch && current.lang == nextPossibleMatch.lang){
-      j++;
-      nextPossibleMatch = cues[j]
-    }
-    
-    if(nextPossibleMatch){
-      if(isMatch(current,nextPossibleMatch, thresh)){
-        alignCues(current,nextPossibleMatch)
-      }else{
-        continue;
-      }
-    }else{
-      break;
-    }
-  }
-
-  clearDom();
-  renderSrtInit(cues);
-}*/
 
 function alignCues(a,b){
   let start = Math.min(a.startTime,b.startTime)
@@ -73,16 +40,4 @@ function isMatch(a,b){
   let endDiff = Math.abs(a.endTime - b.endTime);
   return (startDiff < thresh && endDiff < thresh);
 }
-
-function clearDom(){
-  const left = document.getElementById("left");
-  const right = document.getElementById("right");
-  left.innerHTML = '';
-  right.innerHTML = '';
-}
-
-function addPostRenderEvents() {
-  document.getElementById("srtContainer").addEventListener("mousedown", onMouseDown);
-}
-
 

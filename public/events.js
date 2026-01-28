@@ -1,3 +1,5 @@
+import { clickCue, shiftCue } from "./model.js"
+
 let mouseUpHandler;
 let mouseMoveHandler;
 
@@ -20,8 +22,9 @@ function onMouseDown(event) {
 function onMouseUp(event, initialClickedElm, initialClickedPos) {
   let unclickedElement = event.target.closest('.cue');
   if (!unclickedElement) unclickedElement = initialClickedElm
+
   if (event.clientY === initialClickedPos) { 
-    //handleSingleClick(unclickedElement) => add cue to selected elements
+    clickCue(event)
     window.removeEventListener('mousemove', mouseMoveHandler)
     window.removeEventListener('mouseup', mouseUpHandler)
     return;
@@ -35,9 +38,9 @@ function onMouseUp(event, initialClickedElm, initialClickedPos) {
 function onMouseMove(event, initialClicked) {
   const clickedCue = initialClicked.closest('.cue');
   if (initialClicked.classList.contains('resize-handle')) {
-    updateCueSize(event, initialClicked) //convert from dom manip to data manip
+    resizeCue(event) //convert from dom manip to data manip
   } else {
-    updateCuePosition(event, clickedCue)
+    shiftCue(event)
   }
 }
 
@@ -66,26 +69,7 @@ function updateCuePosition(evt, elm, dOff) {
 
 function updateCueSize(evt, elm) {
   const clickedElement = elm.closest('.cue')
-  const container = clickedElement.offsetParent; // nearest positioned ancestor
-  const rect = container.getBoundingClientRect();
-  const y = evt.clientY
-  if(elm.classList.contains('bottom-handle')){
-    clickedElement.style.height = (y - (parseInt(clickedElement.style.top) + rect.top)) + 'px'
-  }else{
-    console.log("element height: ", clickedElement.style.height)
-    console.log("bounding top: ", rect.top)
-    console.log("cursor: ", y)
-    console.log("element top: ", clickedElement.style.top)
-    let temp = parseInt(clickedElement.style.top) - (y - rect.top)
-    console.log('temp:' , temp)  
-    clickedElement.style.top = (y - rect.top)  + 'px'; 
-    clickedElement.style.height = parseInt(clickedElement.style.height) + temp + 'px';
-    
-  }
   
-  //const cueToUpdate = srtData.find(element => element.id === clickedElement.id)
-  //cueToUpdate.endTime = (y-rect.top) * 60 ;
-  //cueToUpdate.duration = cueToUpdate.endTime - cueToUpdate.startTime;
 }
 
 function addEvents() {

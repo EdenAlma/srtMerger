@@ -40,4 +40,12 @@ function renderCue(cue) {
 }
 
 
+
+function updateCueRender(cue) {
+    div.style.top = (cue.startTime) / 60 + 'px';
+    div.style.height = cue.duration / 60 + 'px';
+}
+
+
+
 export {renderSrt};

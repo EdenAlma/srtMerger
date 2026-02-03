@@ -44,7 +44,7 @@ export class srtCombine {
             let rawText = '';
             let containsBreak = false;
             while (block[i]) {
-                rawText += ((i > 2) ? '\n' : '') + block[i]
+                rawText += ((i > 2) ? '<br>' : '') + block[i]
                 if (i > 2) containsBreak = true;
                 i++
             }

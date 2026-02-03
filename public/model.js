@@ -38,7 +38,7 @@ function commitTextEdits() {
     for(let i = 0; i<editedElements.length; i++){
         let editedCue = editedElements[i];
         let textSpan = document.getElementById(editedCue.id).querySelector('.cue-text');
-        let updatedText = textSpan.textContent;
+        let updatedText = textSpan.innerHTML;
         editedCue.rawText = updatedText;
         updateCueRender(editedCue);
     }

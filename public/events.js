@@ -1,30 +1,36 @@
-import { clickCue, shiftCue } from "./model.js"
+import { resizeCue, shiftCue, isSelected, unSelectCue, selectCue, commitTextEdits, editCue } from "./model.js"
 
 let mouseUpHandler;
 let mouseMoveHandler;
 
 function onMouseDown(event) {
-  // Check if the clicked element (event.target) has the class 'box'
-  const clickedElement = event.target;
-  const clickedCue = event.target.closest('.cue');
-  const clickYPosition = event.clientY
 
-  if (clickedCue) {
+  // Check if the clicked element (event.target) has the class 'box'
+  const clickedElement = event.target; //html element that was clicked
+  const clickedCue = event.target.closest('.cue'); //cue element that was click
+  const clickYPosition = event.clientY; //initial y position clicked
+
+  if (clickedCue) { //must be element within a cue
+
+    const cueTop = parseInt(clickedCue.style.top); //top position of the clicked cue
+    const cueHeight = parseInt(clickedCue.style.height);
     mouseUpHandler = (event) => onMouseUp(event, clickedElement, clickYPosition)
-    mouseMoveHandler = (event) => onMouseMove(event, clickedElement)
-  }else{
-    return
+    mouseMoveHandler = (event) => onMouseMove(event, clickedElement, clickYPosition, cueTop, cueHeight)
+  } else {
+    commitTextEdits();
+    return;
   }
+
   window.addEventListener('mousemove', mouseMoveHandler)
   window.addEventListener('mouseup', mouseUpHandler)
 }
 
-function onMouseUp(event, initialClickedElm, initialClickedPos) {
+function onMouseUp(event, initialClicked, initialYPosition) {
   let unclickedElement = event.target.closest('.cue');
-  if (!unclickedElement) unclickedElement = initialClickedElm
+  if (!unclickedElement) unclickedElement = initialClicked
 
-  if (event.clientY === initialClickedPos) { 
-    clickCue(event)
+  if (event.clientY === initialYPosition) {
+    handleSingleClick(initialClicked)
     window.removeEventListener('mousemove', mouseMoveHandler)
     window.removeEventListener('mouseup', mouseUpHandler)
     return;
@@ -32,29 +38,52 @@ function onMouseUp(event, initialClickedElm, initialClickedPos) {
 
   window.removeEventListener('mousemove', mouseMoveHandler)
   window.removeEventListener('mouseup', mouseUpHandler)
-  //alignAllCues(srtData);
-}
-
-function onMouseMove(event, initialClicked) {
-  const clickedCue = initialClicked.closest('.cue');
+  const shiftAmount = event.clientY - initialYPosition;
   if (initialClicked.classList.contains('resize-handle')) {
-    resizeCue(event) //convert from dom manip to data manip
+    resizeCue(initialClicked, shiftAmount);
   } else {
-    shiftCue(event)
+    shiftCue(initialClicked, shiftAmount);
   }
 }
 
-function handleSingleClick(element, selectedElements) {
-  const findElementIndex = selectedElements.findIndex(e => element.id === e.id)
-  if(findElementIndex >= 0){
-    selectedElements.splice(findElementIndex)
-    element.classList.remove('selected')
-  }else{
-    selectedElements.push(element)
-    element.classList.add('selected')
-  }
 
+/* This function takes mouse move events and updates the html elements to reflect
+the use actions, it does not perform any data updates as these will only be
+done once the mouseup event fires*/
+function onMouseMove(event, initialClicked, initialYPosition, startTop, startHeight) {
+  const shiftAmount = event.clientY - initialYPosition;
+  if (initialClicked.classList.contains('resize-handle')) {
+    updateCueElementSize(initialClicked, startTop, startHeight, shiftAmount);
+  } else {
+    updateCueElementPosition(initialClicked, startTop, shiftAmount);
+  }
 }
+
+
+let dblClick = null;
+function handleSingleClick(initialClicked) {
+
+  const clickedCue = initialClicked.closest('.cue');
+  dblClick = (event) => handleDoubleClick(event, clickedCue)
+  clickedCue.addEventListener('mousedown', dblClick);
+
+  setTimeout(() => {
+    clickedCue.removeEventListener('mousedown', dblClick);
+  }, 300)
+
+
+  const id = clickedCue.id;
+  if (isSelected(id)) {
+    unSelectCue(id);
+    clickedCue.classList.remove('selected')
+  } else {
+    selectCue(id);
+    clickedCue.classList.add('selected')
+  }
+}
+
+
+
 
 
 function updateCuePosition(evt, elm, dOff) {
@@ -69,10 +98,52 @@ function updateCuePosition(evt, elm, dOff) {
 
 function updateCueSize(evt, elm) {
   const clickedElement = elm.closest('.cue')
-  
+
 }
 
 function addEvents() {
   window.addEventListener('mousedown', onMouseDown)
 }
-export {addEvents};
+export { addEvents };
+/*
+  mousedown
+  → snapshot model values
+
+mousemove
+  → update DOM ONLY (transform / top)
+  → no model writes
+  → no rerender
+
+mouseup
+  → compute final value
+  → update model ONCE
+  → rerender from model
+
+*/
+
+function updateCueElementPosition(clickedElement, startTop, shift) {
+  const cue = clickedElement.closest('.cue');
+  const end = startTop + shift;
+  cue.style.top = end + 'px';
+}
+
+function updateCueElementSize(clickedElement, startTop, startHeight, shift) {
+  const cue = clickedElement.closest('.cue')
+  if (clickedElement.classList.contains('bottom-handle')) {
+    cue.style.height = startHeight + shift + 'px'
+  } else {
+    cue.style.height = startHeight - shift + 'px'
+    cue.style.top = startTop + shift + 'px'
+  }
+}
+
+
+function handleDoubleClick(event, clickedCue) {
+  editCue(clickedCue.id);
+  const textE = clickedCue.querySelector('.cue-text');
+  clickedCue.classList.add('edited')
+  textE.classList.add('editing');
+  textE.contentEditable = true;
+  clickedCue.removeEventListener('mousedown', dblClick);
+  clickedCue.addEventListener('mousedown', (e) => { e.stopPropagation() })
+}

@@ -1,5 +1,5 @@
 function renderSrt(cues) {
-    
+
     for (const cue of cues) {
         renderCue(cue);
     }
@@ -16,7 +16,7 @@ function renderCue(cue) {
     const div = document.createElement("div");
     div.className = "cue";
     div.id = `${cue.id}`
-    div.style.top = (cue.startTime) / 60 + 'px';
+    div.style.top = cue.startTime / 60 + 'px';
     div.style.height = cue.duration / 60 + 'px';
     div.innerHTML = `
       <div class="resize-handle top-handle"></div>
@@ -42,10 +42,13 @@ function renderCue(cue) {
 
 
 function updateCueRender(cue) {
-    div.style.top = (cue.startTime) / 60 + 'px';
-    div.style.height = cue.duration / 60 + 'px';
+    const div = document.getElementById(cue.id)
+    div.parentNode.removeChild(div);
+    renderCue(cue);
 }
 
 
 
-export {renderSrt};
+
+
+export { renderSrt, updateCueRender};

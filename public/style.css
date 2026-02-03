@@ -24,11 +24,16 @@ body {
     width: 50%;
 }
 
+
 .cue {
     position: absolute;
     border-style: solid;
     overflow: visible;
     width: 85%;
+}
+
+.edited{
+    border-style: dotted;
 }
 
 .matched{
@@ -44,12 +49,15 @@ body {
 }
 
 
+
 .cue-text {
-    position: absolute;
-    top: 0;
+    position: relative;
     height: 90%;
 }
 
+.editing {
+    cursor: text;
+}
 
 .resize-handle {
     position: absolute;
@@ -60,11 +68,11 @@ body {
 
 
 .bottom-handle {
-    bottom: 0%;
+    bottom: -2%;
 }
 
 .top-handle{
-    top: 0%;
+    top: -2%;
 }
 
 

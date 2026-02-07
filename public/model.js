@@ -103,7 +103,7 @@ function mergeCues(){
 function splitCues(){
     for(let i = 0; i<selectedElements.length; i++){
         splitCue(selectedElements[i]);
-        selectedElements.splice(i);
+        selectedElements.splice(i,1);
     }
 }
 
@@ -127,11 +127,9 @@ function splitCue(c){
 
 function addCue(cue){
     let index = srtData.findIndex(e => e.id === cue.id)
-    console.log(index)
     if(index > -1) srtData.splice(index,1)
     srtData.push(cue)
     srtData.sort((a, b) => { return a.startTime - b.startTime })
-    console.log(srtData)
 }
 
 

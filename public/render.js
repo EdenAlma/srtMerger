@@ -1,3 +1,5 @@
+import { pixelMultiplier } from "./model.js";
+
 function renderSrt(cues) {
 
     for (const cue of cues) {
@@ -16,8 +18,8 @@ function renderCue(cue) {
     const div = document.createElement("div");
     div.className = "cue";
     div.id = `${cue.id}`
-    div.style.top = cue.startTime / 60 + 'px';
-    div.style.height = cue.duration / 60 + 'px';
+    div.style.top = cue.startTime / pixelMultiplier + 'px';
+    div.style.height = cue.duration / pixelMultiplier + 'px';
     div.innerHTML = `
       <div class="resize-handle top-handle"></div>
       <span class="cue-text">${cue.rawText}</span>
@@ -31,10 +33,8 @@ function renderCue(cue) {
         div.classList.remove('matched')
     }
     if (cue.side === 'left') {
-        //div.classList.add('left-cue');
         left.appendChild(div);
     } else {
-        //div.classList.add('right-cue');
         right.appendChild(div);
     }
 }
@@ -51,4 +51,4 @@ function updateCueRender(cue) {
 
 
 
-export { renderSrt, updateCueRender};
+export { renderSrt, updateCueRender, renderCue};

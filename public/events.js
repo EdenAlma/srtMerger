@@ -1,8 +1,18 @@
-import { resizeCue, shiftCue, isSelected, unSelectCue, selectCue, commitTextEdits, editCue } from "./model.js"
+import { resizeCue, shiftCue, isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, mergeCues, splitCues } from "./model.js"
 
 let mouseUpHandler;
 let mouseMoveHandler;
 
+
+function onKeyDown(event){
+  if(event.key === 's'){
+    splitCues();
+  }else if(event.key === 'm'){
+    mergeCues();
+  }else{
+    return;
+  }
+}
 function onMouseDown(event) {
 
   // Check if the clicked element (event.target) has the class 'box'
@@ -85,24 +95,9 @@ function handleSingleClick(initialClicked) {
 
 
 
-
-function updateCuePosition(evt, elm, dOff) {
-
-  //const y = evt.clientY + dOff;
-  //elm.style.top = `${y}px`;
-  //const cueToUpdate = srtData.find(element => element.id === elm.id)
-  //cueToUpdate.startTime = y * 60;
-  //cueToUpdate.endTime = cueToUpdate.startTime + cueToUpdate.duration;
-
-}
-
-function updateCueSize(evt, elm) {
-  const clickedElement = elm.closest('.cue')
-
-}
-
 function addEvents() {
   window.addEventListener('mousedown', onMouseDown)
+  window.addEventListener('keydown', onKeyDown);
 }
 export { addEvents };
 /*
@@ -139,7 +134,7 @@ function updateCueElementSize(clickedElement, startTop, startHeight, shift) {
 
 
 function handleDoubleClick(event, clickedCue) {
-  editCue(clickedCue.id);
+  editCueText(clickedCue.id);
   const textE = clickedCue.querySelector('.cue-text');
   clickedCue.classList.add('edited')
   textE.classList.add('editing');

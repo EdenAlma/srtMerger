@@ -5,6 +5,8 @@ import { srtData,selectedElements,thresh } from "./model.js";
 
 const mergeBtn = document.getElementById('mergeBtn');
 const alignBtn = document.getElementById('alignBtn');
+let cps;
+let cpl;
 
 
 mergeBtn.addEventListener('click', async () => {
@@ -12,6 +14,8 @@ mergeBtn.addEventListener('click', async () => {
   const srt2File = document.getElementById("srt2").files[0];
   let temp = await srtCombine.getCombinedSrt(srt1File, srt2File);
   srtData.push(...temp)
+  cps = document.getElementById("cps").value;
+  cpl = document.getElementById("cpl").value;
   //const root = document.documentElement;
   //root.style.setProperty('--extend', thresh + 'px');
   renderSrt(srtData);

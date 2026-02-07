@@ -1,9 +1,10 @@
-import { updateCueRender } from "./render.js";
+import { updateCueRender, renderCue } from "./render.js";
 let thresh = 0
 const srtData = [];
 const selectedElements = []
 const editedElements = []
-const pixelMultiplier = 60;
+const pixelMultiplier = 40;
+const tagPattern = new RegExp("<[a-z]+>|</[a-z]+>", "g");
 
 export { thresh, srtData, selectedElements }
 
@@ -14,7 +15,6 @@ function shiftCue(clickedElement, shiftAmount) {
     const cueToUpdate = srtData.find(element => element.id === clickedCueId)
     cueToUpdate.startTime += shiftAmount * pixelMultiplier;
     cueToUpdate.endTime += shiftAmount * pixelMultiplier;
-    console.log(cueToUpdate);
     updateCueRender(cueToUpdate)
 }
 
@@ -30,12 +30,11 @@ function resizeCue(clickedElement, shiftAmount) {
         cueToUpdate.startTime += shiftAmount * pixelMultiplier;
         cueToUpdate.duration -= shiftAmount * pixelMultiplier;
     }
-    console.log(cueToUpdate)
     updateCueRender(cueToUpdate)
 }
 
 function commitTextEdits() {
-    for(let i = 0; i<editedElements.length; i++){
+    for (let i = 0; i < editedElements.length; i++) {
         let editedCue = editedElements[i];
         let textSpan = document.getElementById(editedCue.id).querySelector('.cue-text');
         let updatedText = textSpan.innerHTML;
@@ -60,9 +59,81 @@ function unSelectCue(id) {
     selectedElements.splice(index)
 }
 
-function editCue(id) {
+function editCueText(id) {
     const element = srtData.find(e => e.id === id)
     editedElements.push(element)
 }
 
-export {shiftCue, resizeCue, isSelected, selectCue, unSelectCue, editCue, commitTextEdits}
+function createCue(id, start, end, text, side) {
+    let item = {}
+    item.side = side
+    item.rawText = text;
+    item.textLength = item.rawText.replaceAll(tagPattern, '').length;
+    item.startTime = start;
+    item.endTime = end;
+    item.duration = item.endTime - item.startTime
+    item.cps = item.textLength / (item.duration * 1000)
+    item.matched = false;
+    item.id = id;
+    return item
+}
+
+
+function createNewCue(start, end, text, side) {
+    let item = {}
+    item.side = side
+    item.rawText = text;
+    item.textLength = item.rawText.replaceAll(tagPattern, '').length;
+    item.startTime = start;
+    item.endTime = end;
+    item.duration = item.endTime - item.startTime
+    item.cps = item.textLength / (item.duration * 1000)
+    item.matched = false;
+    item.id = crypto.randomUUID();
+    return item
+}
+
+
+function validateMerge(){
+}
+
+function mergeCues(){
+}
+
+function splitCues(){
+    for(let i = 0; i<selectedElements.length; i++){
+        splitCue(selectedElements[i]);
+        selectedElements.splice(i);
+    }
+}
+
+function validateSplit(){
+}
+
+function splitCue(c){
+    let cues = c.rawText.split('<br>')
+    if(cues.length != 2) return
+    let r1 = cues[0].length/c.textLength;
+    let d1 = r1*c.duration;
+    let cue1 = createCue(c.id, c.startTime, c.startTime+d1, cues[0],c.side)
+    let cue2 = createNewCue(c.startTime+d1+1, c.endTime, cues[1],c.side)
+    addCue(cue1)
+    addCue(cue2)
+    updateCueRender(cue1)
+    renderCue(cue2)
+
+}
+
+
+function addCue(cue){
+    let index = srtData.findIndex(e => e.id === cue.id)
+    console.log(index)
+    if(index > -1) srtData.splice(index,1)
+    srtData.push(cue)
+    srtData.sort((a, b) => { return a.startTime - b.startTime })
+    console.log(srtData)
+}
+
+
+
+export { shiftCue, resizeCue, isSelected, selectCue, unSelectCue, editCueText, createCue, createNewCue, commitTextEdits, pixelMultiplier, mergeCues, splitCues}

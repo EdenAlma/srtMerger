@@ -1,3 +1,5 @@
+import { createNewCue } from "./model.js";
+
 export class srtCombine {
     
 
@@ -31,33 +33,22 @@ export class srtCombine {
     static async srtToJSON(path, side){
 
         const fileString = await srtCombine.getStrText(path);
-        const tagPattern = new RegExp("<[a-z]{1}>|</[a-z]{1}>", "g")
         const srtArray = fileString.split('\r\n\r\n')
 
         const mapped = srtArray.map((record) => {
 
             let block = record.split('\r\n')
-            let item = {}
-            item.side = side
-            item.seq = block[0]
             let i = 2
             let rawText = '';
-            let containsBreak = false;
             while (block[i]) {
                 rawText += ((i > 2) ? '<br>' : '') + block[i]
-                if (i > 2) containsBreak = true;
                 i++
             }
 
-            item.rawText = rawText;
-            item.containsBreak = containsBreak
-            item.textLength = rawText.replaceAll(tagPattern, '').length; 
-            item.startTime = srtCombine.parseSrtTime(block[1].split(' --> ')[0])
-            item.endTime = srtCombine.parseSrtTime(block[1].split(' --> ')[1])
-            item.duration = item.endTime - item.startTime
-            item.matched = false;
-            item.id = crypto.randomUUID();
-            return item
+            let text  = rawText;
+            let start = srtCombine.parseSrtTime(block[1].split(' --> ')[0])
+            let end = srtCombine.parseSrtTime(block[1].split(' --> ')[1])
+            return createNewCue(start, end, text, side);
         })
 
         return mapped;

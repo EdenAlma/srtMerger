@@ -101,7 +101,8 @@ function mergeCues(){
 }
 
 function splitCues(){
-    for(let i = 0; i<selectedElements.length; i++){
+    let i = selectedElements.length-1
+    for(;i >= 0; i--){
         splitCue(selectedElements[i]);
         selectedElements.splice(i,1);
     }

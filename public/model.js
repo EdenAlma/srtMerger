@@ -94,30 +94,30 @@ function createNewCue(start, end, text, side) {
 }
 
 
-function validateMerge(){
+function validateMerge() {
 }
 
-function mergeCues(){
+function mergeCues() {
 }
 
-function splitCues(){
-    let i = selectedElements.length-1
-    for(;i >= 0; i--){
+function splitCues() {
+    let i = selectedElements.length - 1
+    for (; i >= 0; i--) {
         splitCue(selectedElements[i]);
-        selectedElements.splice(i,1);
+        selectedElements.splice(i, 1);
     }
 }
 
-function validateSplit(){
+function validateSplit() {
 }
 
-function splitCue(c){
+function splitCue(c) {
     let cues = c.rawText.split('<br>')
-    if(cues.length != 2) return
-    let r1 = cues[0].length/c.textLength;
-    let d1 = r1*c.duration;
-    let cue1 = createCue(c.id, c.startTime, c.startTime+d1, cues[0],c.side)
-    let cue2 = createNewCue(c.startTime+d1+1, c.endTime, cues[1],c.side)
+    if (cues.length != 2) return
+    let r1 = cues[0].length / c.textLength;
+    let d1 = r1 * c.duration;
+    let cue1 = createCue(c.id, c.startTime, c.startTime + d1, cues[0], c.side)
+    let cue2 = createNewCue(c.startTime + d1 + 1, c.endTime, cues[1], c.side)
     addCue(cue1)
     addCue(cue2)
     updateCueRender(cue1)
@@ -126,13 +126,47 @@ function splitCue(c){
 }
 
 
-function addCue(cue){
+function addCue(cue) {
     let index = srtData.findIndex(e => e.id === cue.id)
-    if(index > -1) srtData.splice(index,1)
+    if (index > -1) srtData.splice(index, 1)
     srtData.push(cue)
     srtData.sort((a, b) => { return a.startTime - b.startTime })
 }
 
 
+function alignCues() {
+    let cueCount = srtData.length;
+    //for (let i = 0; i < cueCount; i++) {
+        alignCue(srtData[0])
+    //}
+}
 
-export { shiftCue, resizeCue, isSelected, selectCue, unSelectCue, editCueText, createCue, createNewCue, commitTextEdits, pixelMultiplier, mergeCues, splitCues}
+
+
+function alignCue(cue) {
+    console.log(getNext(cue))
+    console.log(getPrev(cue))
+}
+
+
+function getNext(cue) {
+    let current = srtData.findIndex(e => e === cue)
+    let next = current + 1;
+    while (srtData[next] && srtData[next].side === cue.side) {
+        next++;
+    }
+
+    return srtData[next]
+}
+
+function getPrev(cue) {
+    let current = srtData.findIndex(e => e === cue)
+    let prev = current - 1;
+    while (srtData[prev] && srtData[prev].side === cue.side) {
+        prev--;
+    }
+
+    return srtData[prev]
+}
+
+export { shiftCue, resizeCue, isSelected, selectCue, unSelectCue, editCueText, createCue, createNewCue, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues }

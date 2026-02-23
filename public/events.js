@@ -1,4 +1,4 @@
-import { resizeCue, shiftCue, isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, mergeCues, splitCues } from "./model.js"
+import { resizeCue, shiftCue, isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, mergeCues, splitCues, alignCues } from "./model.js"
 
 let mouseUpHandler;
 let mouseMoveHandler;
@@ -9,6 +9,8 @@ function onKeyDown(event){
     splitCues();
   }else if(event.key === 'm'){
     mergeCues();
+  }else if(event.key === 'a'){
+    alignCues();
   }else{
     return;
   }

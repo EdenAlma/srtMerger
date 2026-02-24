@@ -1,5 +1,5 @@
 import { updateCueRender, renderCue } from "./render.js";
-let thresh = 0
+let thresh = {"value" : 0};
 const srtData = [];
 const selectedElements = []
 const editedElements = []
@@ -32,6 +32,11 @@ function resizeCue(clickedElement, shiftAmount) {
     }
     updateCueRender(cueToUpdate)
 }
+
+function updateCue(cue,) {
+
+}
+
 
 function commitTextEdits() {
     for (let i = 0; i < editedElements.length; i++) {
@@ -136,17 +141,33 @@ function addCue(cue) {
 
 function alignCues() {
     let cueCount = srtData.length;
-    //for (let i = 0; i < cueCount; i++) {
-        alignCue(srtData[0])
-    //}
+    for (let i = 0; i < cueCount; i++) {
+        alignCue(srtData[i])
+    }
 }
 
 
 
 function alignCue(cue) {
-    console.log(getNext(cue))
-    console.log(getPrev(cue))
+
+    let next = getNext(cue);
+    if(!next) return;
+    let startGap = Math.abs(next.startTime - cue.startTime)
+    let endGap = Math.abs(next.endTime - cue.endTime)
+    if (startGap < thresh.value && endGap < thresh.value) {
+        let start = Math.min(cue.startTime, next.startTime)
+        let end = Math.min(cue.endTime, next.endTime)
+        cue = createCue(cue.id, start, end, cue.rawText, cue.side);
+        next = createCue(next.id, start, end, next.rawText, next.side)
+        cue.matched = true;
+        next.matched = true;
+        updateCueRender(cue);
+        updateCueRender(next);
+    }
 }
+
+
+
 
 
 function getNext(cue) {
@@ -159,6 +180,7 @@ function getNext(cue) {
     return srtData[next]
 }
 
+//not needed?
 function getPrev(cue) {
     let current = srtData.findIndex(e => e === cue)
     let prev = current - 1;

@@ -191,4 +191,4 @@ function getPrev(cue) {
     return srtData[prev]
 }
 
-export { shiftCue, resizeCue, isSelected, selectCue, unSelectCue, editCueText, createCue, createNewCue, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues }
+export { shiftCue, resizeCue, isSelected, selectCue, unSelectCue, editCueText, createCue, createNewCue, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues, splitCue }

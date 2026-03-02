@@ -1,5 +1,5 @@
 import { updateCueRender, renderCue } from "./render.js";
-let thresh = {"value" : 0};
+let thresh = { "value": 0 };
 const srtData = [];
 const selectedElements = []
 const editedElements = []
@@ -9,12 +9,37 @@ const tagPattern = new RegExp("<[a-z]+>|</[a-z]+>", "g");
 export { thresh, srtData, selectedElements }
 
 function shiftCue(clickedElement, shiftAmount) {
+
     const clickedCue = clickedElement.closest('.cue')
     if (!clickedCue) return
     const clickedCueId = clickedCue.id
     const cueToUpdate = srtData.find(element => element.id === clickedCueId)
-    cueToUpdate.startTime += shiftAmount * pixelMultiplier;
-    cueToUpdate.endTime += shiftAmount * pixelMultiplier;
+    let previousCue = getPrev(cueToUpdate, true);
+    let nextCue = getNext(cueToUpdate, true);
+    let min;
+    let max;
+
+    if (!previousCue) {
+        min = 0
+    } else {
+        min = previousCue.endTime + 1;
+    }
+
+    if (!nextCue) {
+        max = Infinity;
+    } else {
+        max = nextCue.startTime - 1;
+    }
+    let shiftStart = Math.min((cueToUpdate.startTime + (shiftAmount * pixelMultiplier)),max);
+    let shiftEnd = cueToUpdate.endTime + (shiftAmount * pixelMultiplier);
+    let newStart = Math.max(shiftStart, min)
+    let newEnd = Math.min(shiftEnd, max);
+    let newDuration = newEnd - newStart;
+    if(newDuration > 100){
+        cueToUpdate.startTime = newStart;
+        cueToUpdate.endTime = newEnd;
+        cueToUpdate.duration = newDuration;
+    }
     updateCueRender(cueToUpdate)
 }
 
@@ -23,6 +48,10 @@ function resizeCue(clickedElement, shiftAmount) {
     if (!clickedCue) return
     const clickedCueId = clickedCue.id
     const cueToUpdate = srtData.find(element => element.id === clickedCueId)
+    let previousCue = getPrev(cueToUpdate, true);
+    let nextCue = getNext(cueToUpdate, true);
+    let min = previousCue.endTime + 1;
+    let max = nextCue.startTime - 1;
     if (clickedElement.classList.contains('bottom-handle')) {
         cueToUpdate.endTime += shiftAmount * pixelMultiplier;
         cueToUpdate.duration += shiftAmount * pixelMultiplier;
@@ -33,9 +62,6 @@ function resizeCue(clickedElement, shiftAmount) {
     updateCueRender(cueToUpdate)
 }
 
-function updateCue(cue,) {
-
-}
 
 
 function commitTextEdits() {
@@ -150,8 +176,8 @@ function alignCues() {
 
 function alignCue(cue) {
 
-    let next = getNext(cue);
-    if(!next) return;
+    let next = getNext(cue, false);
+    if (!next) return;
     let startGap = Math.abs(next.startTime - cue.startTime)
     let endGap = Math.abs(next.endTime - cue.endTime)
     if (startGap < thresh.value && endGap < thresh.value) {
@@ -170,23 +196,36 @@ function alignCue(cue) {
 
 
 
-function getNext(cue) {
+function getNext(cue, same) {
     let current = srtData.findIndex(e => e === cue)
     let next = current + 1;
-    while (srtData[next] && srtData[next].side === cue.side) {
-        next++;
+    if (same) {
+        while (srtData[next] && srtData[next].side != cue.side) {
+            next++;
+        }
+    } else {
+        while (srtData[next] && srtData[next].side === cue.side) {
+            next++;
+        }
     }
 
     return srtData[next]
 }
 
 //not needed?
-function getPrev(cue) {
+function getPrev(cue, same) {
     let current = srtData.findIndex(e => e === cue)
     let prev = current - 1;
-    while (srtData[prev] && srtData[prev].side === cue.side) {
-        prev--;
+    if (same) {
+        while (srtData[prev] && srtData[prev].side != cue.side) {
+            prev--;
+        }
+    } else {
+        while (srtData[prev] && srtData[prev].side === cue.side) {
+            prev--;
+        }
     }
+
 
     return srtData[prev]
 }

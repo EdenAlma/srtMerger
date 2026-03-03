@@ -1,7 +1,7 @@
 import { srtCombine } from "./srtCombine.js"
 import { addEvents } from "./events.js"
 import { renderSrt } from "./render.js";
-import { srtData,thresh,splitCue } from "./model.js";
+import { srtData, thresh, splitCue } from "./model.js";
 
 const mergeBtn = document.getElementById('mergeBtn');
 let cps;
@@ -22,8 +22,16 @@ mergeBtn.addEventListener('click', async () => {
   addEvents();
   let x = 0;
   //split all the cue ---> add something to not split if theres no corresponding one 
-  while(x < srtData.length){ 
-    splitCue(srtData[x])
+  while (x < srtData.length) {
+
+    let check = srtData.find(c => {
+      return c.side != srtData[x].side
+        && (c.startTime > srtData[x].startTime && c.startTime < srtData[x].endTime
+          || c.endTime > srtData[x.startTime] && c.endTime < srtData[x.endTime])
+    })
+    if (check) {
+      splitCue(srtData[x])
+    }
     x++;
   }
 })

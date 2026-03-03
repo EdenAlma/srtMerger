@@ -157,7 +157,9 @@ function splitCues() {
     }
 }
 
-
+function mergeCues(){
+    
+}
 
 function splitCue(c) {
     let cues = c.rawText.split('<br>')

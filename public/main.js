@@ -27,7 +27,7 @@ mergeBtn.addEventListener('click', async () => {
     let check = srtData.find(c => {
       return c.side != srtData[x].side
         && (c.startTime > srtData[x].startTime && c.startTime < srtData[x].endTime
-          || c.endTime > srtData[x.startTime] && c.endTime < srtData[x.endTime])
+          || srtData[x].startTime > c.startTime && srtData[x].startTime < c.endTime)
     })
     if (check) {
       splitCue(srtData[x])

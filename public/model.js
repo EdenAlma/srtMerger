@@ -14,8 +14,24 @@ function shiftCue(clickedElement, shiftAmount) {
     if (!clickedCue) return
     const clickedCueId = clickedCue.id
     const cueToUpdate = srtData.find(element => element.id === clickedCueId)
-    let previousCue = getPrev(cueToUpdate, true);
-    let nextCue = getNext(cueToUpdate, true);
+    let { min, max } = getLimits(cueToUpdate);
+
+    let shiftStart = Math.min((cueToUpdate.startTime + (shiftAmount * pixelMultiplier)), max);
+    let shiftEnd = cueToUpdate.endTime + (shiftAmount * pixelMultiplier);
+    let newStart = Math.max(shiftStart, min)
+    let newEnd = Math.min(shiftEnd, max);
+    let newDuration = newEnd - newStart;
+    if (newDuration > 100) {
+        cueToUpdate.startTime = newStart;
+        cueToUpdate.endTime = newEnd;
+        cueToUpdate.duration = newDuration;
+    }
+    updateCueRender(cueToUpdate)
+}
+
+function getLimits(cue) {
+    let previousCue = getPrev(cue, true);
+    let nextCue = getNext(cue, true);
     let min;
     let max;
 
@@ -30,47 +46,53 @@ function shiftCue(clickedElement, shiftAmount) {
     } else {
         max = nextCue.startTime - 1;
     }
-    let shiftStart = Math.min((cueToUpdate.startTime + (shiftAmount * pixelMultiplier)),max);
-    let shiftEnd = cueToUpdate.endTime + (shiftAmount * pixelMultiplier);
-    let newStart = Math.max(shiftStart, min)
-    let newEnd = Math.min(shiftEnd, max);
-    let newDuration = newEnd - newStart;
-    if(newDuration > 100){
-        cueToUpdate.startTime = newStart;
-        cueToUpdate.endTime = newEnd;
-        cueToUpdate.duration = newDuration;
-    }
-    updateCueRender(cueToUpdate)
+
+    return { min, max }
 }
+
 
 function resizeCue(clickedElement, shiftAmount) {
     const clickedCue = clickedElement.closest('.cue')
     if (!clickedCue) return
     const clickedCueId = clickedCue.id
     const cueToUpdate = srtData.find(element => element.id === clickedCueId)
-    let previousCue = getPrev(cueToUpdate, true);
-    let nextCue = getNext(cueToUpdate, true);
-    let min = previousCue.endTime + 1;
-    let max = nextCue.startTime - 1;
+    let { min, max } = getLimits(cueToUpdate);
+    let shift = shiftAmount * pixelMultiplier;
+    let newEnd, newDuration, newStart;
+
     if (clickedElement.classList.contains('bottom-handle')) {
-        cueToUpdate.endTime += shiftAmount * pixelMultiplier;
-        cueToUpdate.duration += shiftAmount * pixelMultiplier;
+        newEnd = Math.min((cueToUpdate.endTime + shift), max);
+        newDuration = newEnd - cueToUpdate.startTime;
+        
     } else {
-        cueToUpdate.startTime += shiftAmount * pixelMultiplier;
-        cueToUpdate.duration -= shiftAmount * pixelMultiplier;
+        newStart = Math.max((cueToUpdate.startTime + shift), min);
+        newDuration = cueToUpdate.endTime - newStart;
+        
     }
+
+    if (newDuration > 100) {
+        cueToUpdate.duration = newDuration;
+        if (newStart) {
+            cueToUpdate.startTime = newStart;
+        } else {
+            cueToUpdate.endTime = newEnd;
+        }
+    }
+
     updateCueRender(cueToUpdate)
 }
 
 
 
 function commitTextEdits() {
-    for (let i = 0; i < editedElements.length; i++) {
+    let i = editedElements.length - 1
+    for (; i >= 0; i--) {
         let editedCue = editedElements[i];
         let textSpan = document.getElementById(editedCue.id).querySelector('.cue-text');
         let updatedText = textSpan.innerHTML;
         editedCue.rawText = updatedText;
         updateCueRender(editedCue);
+        editedElements.splice(i, 1);
     }
 }
 
@@ -125,11 +147,7 @@ function createNewCue(start, end, text, side) {
 }
 
 
-function validateMerge() {
-}
 
-function mergeCues() {
-}
 
 function splitCues() {
     let i = selectedElements.length - 1
@@ -139,8 +157,7 @@ function splitCues() {
     }
 }
 
-function validateSplit() {
-}
+
 
 function splitCue(c) {
     let cues = c.rawText.split('<br>')

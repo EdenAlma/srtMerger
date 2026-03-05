@@ -30,6 +30,7 @@ function onMouseDown(event) {
     mouseMoveHandler = (event) => onMouseMove(event, clickedElement, clickYPosition, cueTop, cueHeight)
   } else {
     commitTextEdits();
+    window.addEventListener('keydown',onKeyDown)
     return;
   }
 
@@ -136,6 +137,7 @@ function updateCueElementSize(clickedElement, startTop, startHeight, shift) {
 
 
 function handleDoubleClick(event, clickedCue) {
+  window.removeEventListener('keydown',onKeyDown);
   editCueText(clickedCue.id);
   const textE = clickedCue.querySelector('.cue-text');
   clickedCue.classList.add('edited')

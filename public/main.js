@@ -34,6 +34,8 @@ mergeBtn.addEventListener('click', async () => {
     }
     x++;
   }
+
+  mergeBtn.parentNode.removeChild(mergeBtn);
 })
 
 

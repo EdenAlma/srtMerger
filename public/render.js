@@ -48,7 +48,12 @@ function updateCueRender(cue) {
 }
 
 
+function deleteCueRender(id){
+    const div = document.getElementById(id)
+    div.parentNode.removeChild(div);
+}
 
 
 
-export { renderSrt, updateCueRender, renderCue};
+
+export { renderSrt, updateCueRender, renderCue, deleteCueRender};

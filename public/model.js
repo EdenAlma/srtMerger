@@ -1,4 +1,4 @@
-import { updateCueRender, renderCue } from "./render.js";
+import { updateCueRender, renderCue, deleteCueRender } from "./render.js";
 let thresh = { "value": 0 };
 const srtData = [];
 const selectedElements = []
@@ -158,7 +158,20 @@ function splitCues() {
 }
 
 function mergeCues(){
-    
+    if(selectedElements.length != 2) return;
+    selectedElements.sort((a, b) => { return a.startTime - b.startTime })
+    let firstElement = selectedElements[0];
+    let next = getNext(firstElement,true);
+    if(next != selectedElements[1]) return;
+    let newCue = selectedElements[0];
+    let newText = selectedElements[0].rawText + selectedElements[1].rawText;
+    newCue.rawText = newText;
+    newCue.endTime = selectedElements[1].endTime;
+    newCue.duration = newCue.endTime - newCue.startTime;
+    deleteCueRender(selectedElements[1].id);
+    srtData.splice(srtData.findIndex(e => e.id === selectedElements[1].id),1)
+    selectedElements.splice(0);
+    updateCueRender(newCue);
 }
 
 function splitCue(c) {

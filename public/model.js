@@ -8,6 +8,12 @@ const tagPattern = new RegExp("<[a-z]+>|</[a-z]+>", "g");
 
 export { thresh, srtData, selectedElements }
 
+/**
+ * Cue class method
+ * @param {HTMLElement} clickedElement - The element which is to be shifted
+ * @param {number} shiftAmount - the amount that the element has shifted since it was first clicked
+ * @returns nohing
+ */
 function shiftCue(clickedElement, shiftAmount) {
 
     const clickedCue = clickedElement.closest('.cue')
@@ -29,6 +35,11 @@ function shiftCue(clickedElement, shiftAmount) {
     updateCueRender(cueToUpdate)
 }
 
+/**
+ * Cue class method
+ * @param {Cue} cue 
+ * @returns 
+ */
 function getLimits(cue) {
     let previousCue = getPrev(cue, true);
     let nextCue = getNext(cue, true);
@@ -50,7 +61,12 @@ function getLimits(cue) {
     return { min, max }
 }
 
-
+/**
+ * Cue class method
+ * @param {*} clickedElement 
+ * @param {*} shiftAmount 
+ * @returns 
+ */
 function resizeCue(clickedElement, shiftAmount) {
     const clickedCue = clickedElement.closest('.cue')
     if (!clickedCue) return
@@ -83,7 +99,9 @@ function resizeCue(clickedElement, shiftAmount) {
 }
 
 
-
+/**
+ * model method
+ */
 function commitTextEdits() {
     let i = editedElements.length - 1
     for (; i >= 0; i--) {
@@ -96,27 +114,52 @@ function commitTextEdits() {
     }
 }
 
+/**
+ * model method
+ * @param {string} id 
+ * @returns 
+ */
 function isSelected(id) {
     const element = selectedElements.find(e => e.id === id)
     return element ? true : false;
 }
 
-
+/**
+ * model method
+ * @param {*} id 
+ */
 function selectCue(id) {
     const element = srtData.find(e => e.id === id)
     selectedElements.push(element)
 }
 
+/**
+ * model method
+ * @param {string} id 
+ */
 function unSelectCue(id) {
     const index = selectedElements.findIndex(e => e.id === id)
     selectedElements.splice(index)
 }
 
+/**
+ * model method
+ * @param {string} id 
+ */
 function editCueText(id) {
     const element = srtData.find(e => e.id === id)
     editedElements.push(element)
 }
 
+/**
+ * Cue method (constructor for cue)
+ * @param {string} id 
+ * @param {number} start 
+ * @param {number} end 
+ * @param {string} text 
+ * @param {string} side 
+ * @returns 
+ */
 function createCue(id, start, end, text, side) {
     let item = {}
     item.side = side
@@ -131,7 +174,14 @@ function createCue(id, start, end, text, side) {
     return item
 }
 
-
+/**
+ * Cue method (constructor for cue)
+ * @param {number} start 
+ * @param {number} end 
+ * @param {string} text 
+ * @param {string} side 
+ * @returns 
+ */
 function createNewCue(start, end, text, side) {
     let item = {}
     item.side = side
@@ -148,7 +198,9 @@ function createNewCue(start, end, text, side) {
 
 
 
-
+/**
+ * model method
+ */
 function splitCues() {
     let i = selectedElements.length - 1
     for (; i >= 0; i--) {
@@ -157,6 +209,10 @@ function splitCues() {
     }
 }
 
+/**
+ * model method
+ * @returns nothing
+ */
 function mergeCues(){
     if(selectedElements.length != 2) return;
     selectedElements.sort((a, b) => { return a.startTime - b.startTime })
@@ -174,6 +230,11 @@ function mergeCues(){
     updateCueRender(newCue);
 }
 
+/**
+ * Cue class method
+ * @param {Cue} c 
+ * @returns 
+ */
 function splitCue(c) {
     let cues = c.rawText.split('<br>')
     if (cues.length != 2) return
@@ -188,15 +249,21 @@ function splitCue(c) {
 
 }
 
-
+/**
+ * Cue class method
+ * @param {Cue} cue 
+ */
 function addCue(cue) {
     let index = srtData.findIndex(e => e.id === cue.id)
-    if (index > -1) srtData.splice(index, 1)
+    if (index > -1) srtData.splice(index, 1) //if it exists already, remove it
     srtData.push(cue)
     srtData.sort((a, b) => { return a.startTime - b.startTime })
 }
 
 
+/**
+ * model method
+ */
 function alignCues() {
     let cueCount = srtData.length;
     for (let i = 0; i < cueCount; i++) {
@@ -205,7 +272,11 @@ function alignCues() {
 }
 
 
-
+/**
+ * Cue class method
+ * @param {Cue} cue 
+ * @returns 
+ */
 function alignCue(cue) {
 
     let next = getNext(cue, false);
@@ -227,7 +298,12 @@ function alignCue(cue) {
 
 
 
-
+/**
+ * Cue class method
+ * @param {Cue} cue 
+ * @param {boolean} same 
+ * @returns 
+ */
 function getNext(cue, same) {
     let current = srtData.findIndex(e => e === cue)
     let next = current + 1;
@@ -244,7 +320,14 @@ function getNext(cue, same) {
     return srtData[next]
 }
 
-//not needed?
+
+
+/**
+ * Cue class method
+ * @param {Cue} cue 
+ * @param {boolean} same 
+ * @returns 
+ */
 function getPrev(cue, same) {
     let current = srtData.findIndex(e => e === cue)
     let prev = current - 1;

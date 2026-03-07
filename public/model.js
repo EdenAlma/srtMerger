@@ -107,7 +107,7 @@ function alignCues() {
     }
 }
 
-function getCue(id){
+function getCue(id) {
     return srtData.find(e => e.id === id)
 }
 
@@ -245,7 +245,9 @@ class Cue {
         let endGap = Math.abs(next.endTime - this.endTime)
         if (startGap < thresh.value && endGap < thresh.value) {
             let start = Math.min(this.startTime, next.startTime)
-            let end = Math.min(this.endTime, next.endTime)
+            start = Math.max(start, next.getLimits().min, this.getLimits().min)
+            let end = Math.max(this.endTime, next.endTime)
+            end = Math.min(end, next.getLimits().max,this.getLimits().max)
             this.updateCue(start, end, this.text, this.side)
             next.updateCue(start, end, next.text, next.side)
             this.matched = true;
@@ -287,7 +289,17 @@ class Cue {
         renderCue(cue2)
     }
 
+    hasNeighbor() {
+        let check = srtData.find(c => {
+            return c.side != this.side
+                && (c.startTime > this.startTime && c.startTime < this.endTime
+                    || this.startTime > c.startTime && this.startTime < c.endTime)
+        })
+
+        if (check) return true;
+        return false
+    }
 }
 
 
-export {isSelected, selectCue, unSelectCue, editCueText, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues, Cue, getCue}
+export { isSelected, selectCue, unSelectCue, editCueText, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues, Cue, getCue }

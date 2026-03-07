@@ -8,96 +8,6 @@ const tagPattern = new RegExp("<[a-z]+>|</[a-z]+>", "g");
 
 export { thresh, srtData, selectedElements }
 
-/**
- * Cue class method
- * @param {HTMLElement} clickedElement - The element which is to be shifted
- * @param {number} shiftAmount - the amount that the element has shifted since it was first clicked
- * @returns nohing
- */
-function shiftCue(clickedElement, shiftAmount) {
-
-    const clickedCue = clickedElement.closest('.cue')
-    if (!clickedCue) return
-    const clickedCueId = clickedCue.id
-    const cueToUpdate = srtData.find(element => element.id === clickedCueId)
-    let { min, max } = getLimits(cueToUpdate);
-
-    let shiftStart = Math.min((cueToUpdate.startTime + (shiftAmount * pixelMultiplier)), max);
-    let shiftEnd = cueToUpdate.endTime + (shiftAmount * pixelMultiplier);
-    let newStart = Math.max(shiftStart, min)
-    let newEnd = Math.min(shiftEnd, max);
-    let newDuration = newEnd - newStart;
-    if (newDuration > 100) {
-        cueToUpdate.startTime = newStart;
-        cueToUpdate.endTime = newEnd;
-        cueToUpdate.duration = newDuration;
-    }
-    updateCueRender(cueToUpdate)
-}
-
-/**
- * Cue class method
- * @param {Cue} cue 
- * @returns 
- */
-function getLimits(cue) {
-    let previousCue = getPrev(cue, true);
-    let nextCue = getNext(cue, true);
-    let min;
-    let max;
-
-    if (!previousCue) {
-        min = 0
-    } else {
-        min = previousCue.endTime + 1;
-    }
-
-    if (!nextCue) {
-        max = Infinity;
-    } else {
-        max = nextCue.startTime - 1;
-    }
-
-    return { min, max }
-}
-
-/**
- * Cue class method
- * @param {*} clickedElement 
- * @param {*} shiftAmount 
- * @returns 
- */
-function resizeCue(clickedElement, shiftAmount) {
-    const clickedCue = clickedElement.closest('.cue')
-    if (!clickedCue) return
-    const clickedCueId = clickedCue.id
-    const cueToUpdate = srtData.find(element => element.id === clickedCueId)
-    let { min, max } = getLimits(cueToUpdate);
-    let shift = shiftAmount * pixelMultiplier;
-    let newEnd, newDuration, newStart;
-
-    if (clickedElement.classList.contains('bottom-handle')) {
-        newEnd = Math.min((cueToUpdate.endTime + shift), max);
-        newDuration = newEnd - cueToUpdate.startTime;
-        
-    } else {
-        newStart = Math.max((cueToUpdate.startTime + shift), min);
-        newDuration = cueToUpdate.endTime - newStart;
-        
-    }
-
-    if (newDuration > 100) {
-        cueToUpdate.duration = newDuration;
-        if (newStart) {
-            cueToUpdate.startTime = newStart;
-        } else {
-            cueToUpdate.endTime = newEnd;
-        }
-    }
-
-    updateCueRender(cueToUpdate)
-}
-
 
 /**
  * model method
@@ -108,7 +18,7 @@ function commitTextEdits() {
         let editedCue = editedElements[i];
         let textSpan = document.getElementById(editedCue.id).querySelector('.cue-text');
         let updatedText = textSpan.innerHTML;
-        editedCue.rawText = updatedText;
+        editedCue.text = updatedText;
         updateCueRender(editedCue);
         editedElements.splice(i, 1);
     }
@@ -151,51 +61,6 @@ function editCueText(id) {
     editedElements.push(element)
 }
 
-/**
- * Cue method (constructor for cue)
- * @param {string} id 
- * @param {number} start 
- * @param {number} end 
- * @param {string} text 
- * @param {string} side 
- * @returns 
- */
-function createCue(id, start, end, text, side) {
-    let item = {}
-    item.side = side
-    item.rawText = text;
-    item.textLength = item.rawText.replaceAll(tagPattern, '').length;
-    item.startTime = start;
-    item.endTime = end;
-    item.duration = item.endTime - item.startTime
-    item.cps = item.textLength / (item.duration * 1000)
-    item.matched = false;
-    item.id = id;
-    return item
-}
-
-/**
- * Cue method (constructor for cue)
- * @param {number} start 
- * @param {number} end 
- * @param {string} text 
- * @param {string} side 
- * @returns 
- */
-function createNewCue(start, end, text, side) {
-    let item = {}
-    item.side = side
-    item.rawText = text;
-    item.textLength = item.rawText.replaceAll(tagPattern, '').length;
-    item.startTime = start;
-    item.endTime = end;
-    item.duration = item.endTime - item.startTime
-    item.cps = item.textLength / (item.duration * 1000)
-    item.matched = false;
-    item.id = crypto.randomUUID();
-    return item
-}
-
 
 
 /**
@@ -204,7 +69,7 @@ function createNewCue(start, end, text, side) {
 function splitCues() {
     let i = selectedElements.length - 1
     for (; i >= 0; i--) {
-        splitCue(selectedElements[i]);
+        selectedElements[i].split();
         selectedElements.splice(i, 1);
     }
 }
@@ -213,52 +78,23 @@ function splitCues() {
  * model method
  * @returns nothing
  */
-function mergeCues(){
-    if(selectedElements.length != 2) return;
+function mergeCues() {
+    if (selectedElements.length != 2) return;
     selectedElements.sort((a, b) => { return a.startTime - b.startTime })
     let firstElement = selectedElements[0];
-    let next = getNext(firstElement,true);
-    if(next != selectedElements[1]) return;
+    let next = firstElement.getNext(true);
+    if (next != selectedElements[1]) return;
     let newCue = selectedElements[0];
-    let newText = selectedElements[0].rawText + selectedElements[1].rawText;
-    newCue.rawText = newText;
+    let newText = selectedElements[0].text + selectedElements[1].text;
+    newCue.text = newText;
     newCue.endTime = selectedElements[1].endTime;
     newCue.duration = newCue.endTime - newCue.startTime;
     deleteCueRender(selectedElements[1].id);
-    srtData.splice(srtData.findIndex(e => e.id === selectedElements[1].id),1)
+    srtData.splice(srtData.findIndex(e => e.id === selectedElements[1].id), 1)
     selectedElements.splice(0);
     updateCueRender(newCue);
 }
 
-/**
- * Cue class method
- * @param {Cue} c 
- * @returns 
- */
-function splitCue(c) {
-    let cues = c.rawText.split('<br>')
-    if (cues.length != 2) return
-    let r1 = cues[0].length / c.textLength;
-    let d1 = r1 * c.duration;
-    let cue1 = createCue(c.id, c.startTime, c.startTime + d1, cues[0], c.side)
-    let cue2 = createNewCue(c.startTime + d1 + 1, c.endTime, cues[1], c.side)
-    addCue(cue1)
-    addCue(cue2)
-    updateCueRender(cue1)
-    renderCue(cue2)
-
-}
-
-/**
- * Cue class method
- * @param {Cue} cue 
- */
-function addCue(cue) {
-    let index = srtData.findIndex(e => e.id === cue.id)
-    if (index > -1) srtData.splice(index, 1) //if it exists already, remove it
-    srtData.push(cue)
-    srtData.sort((a, b) => { return a.startTime - b.startTime })
-}
 
 
 /**
@@ -267,82 +103,191 @@ function addCue(cue) {
 function alignCues() {
     let cueCount = srtData.length;
     for (let i = 0; i < cueCount; i++) {
-        alignCue(srtData[i])
+        srtData[i].alignCue();
     }
+}
+
+function getCue(id){
+    return srtData.find(e => e.id === id)
 }
 
 
 /**
- * Cue class method
- * @param {Cue} cue 
- * @returns 
+ * Class representing SRT cue
  */
-function alignCue(cue) {
+class Cue {
 
-    let next = getNext(cue, false);
-    if (!next) return;
-    let startGap = Math.abs(next.startTime - cue.startTime)
-    let endGap = Math.abs(next.endTime - cue.endTime)
-    if (startGap < thresh.value && endGap < thresh.value) {
-        let start = Math.min(cue.startTime, next.startTime)
-        let end = Math.min(cue.endTime, next.endTime)
-        cue = createCue(cue.id, start, end, cue.rawText, cue.side);
-        next = createCue(next.id, start, end, next.rawText, next.side)
-        cue.matched = true;
-        next.matched = true;
-        updateCueRender(cue);
-        updateCueRender(next);
-    }
-}
-
-
-
-
-/**
- * Cue class method
- * @param {Cue} cue 
- * @param {boolean} same 
- * @returns 
- */
-function getNext(cue, same) {
-    let current = srtData.findIndex(e => e === cue)
-    let next = current + 1;
-    if (same) {
-        while (srtData[next] && srtData[next].side != cue.side) {
-            next++;
-        }
-    } else {
-        while (srtData[next] && srtData[next].side === cue.side) {
-            next++;
+    constructor(start, end, text, side, id) {
+        this.side = side
+        this.text = text;
+        this.textLength = this.text.replaceAll(tagPattern, '').length;
+        this.startTime = start;
+        this.endTime = end;
+        this.duration = end - start;
+        this.cps = this.textLength / (this.duration * 1000)
+        this.matched = false;
+        if (id) {
+            this.id = id;
+        } else {
+            this.id = crypto.randomUUID();
         }
     }
 
-    return srtData[next]
-}
-
-
-
-/**
- * Cue class method
- * @param {Cue} cue 
- * @param {boolean} same 
- * @returns 
- */
-function getPrev(cue, same) {
-    let current = srtData.findIndex(e => e === cue)
-    let prev = current - 1;
-    if (same) {
-        while (srtData[prev] && srtData[prev].side != cue.side) {
-            prev--;
+    resizeTop(shiftAmount) {
+        let { min, max } = this.getLimits();
+        let shift = shiftAmount * pixelMultiplier;
+        let newEnd, newDuration, newStart;
+        newStart = Math.max((this.startTime + shift), min);
+        newDuration = this.endTime - newStart;
+        if (newDuration > 100) {
+            this.duration = newDuration;
+            if (newStart) {
+                this.startTime = newStart;
+            } else {
+                this.endTime = newEnd;
+            }
         }
-    } else {
-        while (srtData[prev] && srtData[prev].side === cue.side) {
-            prev--;
+
+        updateCueRender(this)
+    }
+
+    resizeBottom(shiftAmount) {
+        let { min, max } = this.getLimits();
+        let shift = shiftAmount * pixelMultiplier;
+        let newEnd, newDuration, newStart;
+        newEnd = Math.min((this.endTime + shift), max);
+        newDuration = newEnd - this.startTime;
+
+        if (newDuration > 100) {
+            this.duration = newDuration;
+            this.endTime = newEnd;
+        } else {
+            return
+        }
+        updateCueRender(this)
+    }
+
+    shiftCue(shiftAmount) {
+
+        let { min, max } = this.getLimits();
+
+        let shiftStart = Math.min((this.startTime + (shiftAmount * pixelMultiplier)), max);
+        let shiftEnd = this.endTime + (shiftAmount * pixelMultiplier);
+        let newStart = Math.max(shiftStart, min)
+        let newEnd = Math.min(shiftEnd, max);
+        let newDuration = newEnd - newStart;
+        if (newDuration > 100) {
+            this.startTime = newStart;
+            this.endTime = newEnd;
+            this.duration = newDuration;
+        }
+        updateCueRender(this)
+    }
+
+    getLimits() {
+        let previousCue = this.getPrev(true);
+        let nextCue = this.getNext(true);
+        let min;
+        let max;
+
+        if (!previousCue) {
+            min = 0
+        } else {
+            min = previousCue.endTime + 1;
+        }
+
+        if (!nextCue) {
+            max = Infinity;
+        } else {
+            max = nextCue.startTime - 1;
+        }
+
+        return { min, max }
+    }
+
+    getPrev(same) {
+        let current = srtData.findIndex(e => e === this)
+        let prev = current - 1;
+        if (same) {
+            while (srtData[prev] && srtData[prev].side != this.side) {
+                prev--;
+            }
+        } else {
+            while (srtData[prev] && srtData[prev].side === this.side) {
+                prev--;
+            }
+        }
+
+
+        return srtData[prev]
+    }
+
+    getNext(same) {
+        let current = srtData.findIndex(e => e === this)
+        let next = current + 1;
+        if (same) {
+            while (srtData[next] && srtData[next].side != this.side) {
+                next++;
+            }
+        } else {
+            while (srtData[next] && srtData[next].side === this.side) {
+                next++;
+            }
+        }
+
+        return srtData[next]
+    }
+
+    alignCue() {
+        let next = this.getNext(false)
+        if (!next) return;
+        let startGap = Math.abs(next.startTime - this.startTime)
+        let endGap = Math.abs(next.endTime - this.endTime)
+        if (startGap < thresh.value && endGap < thresh.value) {
+            let start = Math.min(this.startTime, next.startTime)
+            let end = Math.min(this.endTime, next.endTime)
+            this.updateCue(start, end, this.text, this.side)
+            next.updateCue(start, end, next.text, next.side)
+            this.matched = true;
+            next.matched = true;
+            updateCueRender(this);
+            updateCueRender(next);
         }
     }
 
+    updateCue(start, end, text, side) {
+        this.side = side
+        this.text = text;
+        this.textLength = this.text.replaceAll(tagPattern, '').length;
+        this.startTime = start;
+        this.endTime = end;
+        this.duration = end - start;
+        this.cps = this.textLength / (this.duration * 1000) //ms to second
+        this.matched = false;
+    }
 
-    return srtData[prev]
+    add() {
+        let index = srtData.findIndex(e => e.id === this.id)
+        if (index > -1) srtData.splice(index, 1) //if it exists already, remove it
+        srtData.push(this)
+        srtData.sort((a, b) => { return a.startTime - b.startTime })
+    }
+
+
+    split() {
+        let cues = this.text.split('<br>')
+        if (cues.length != 2) return
+        let r1 = cues[0].length / this.textLength;
+        let d1 = r1 * this.duration;
+        let cue1 = new Cue(this.startTime, this.startTime + d1, cues[0], this.side, this.id)
+        let cue2 = new Cue(this.startTime + d1 + 1, this.endTime, cues[1], this.side)
+        cue1.add()
+        cue2.add()
+        updateCueRender(cue1)
+        renderCue(cue2)
+    }
+
 }
 
-export { shiftCue, resizeCue, isSelected, selectCue, unSelectCue, editCueText, createCue, createNewCue, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues, splitCue }
+
+export {isSelected, selectCue, unSelectCue, editCueText, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues, Cue, getCue}

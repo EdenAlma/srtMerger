@@ -1,4 +1,4 @@
-import { createNewCue } from "./model.js";
+import { Cue } from "./model.js";
 
 export class srtCombine {
     
@@ -48,7 +48,7 @@ export class srtCombine {
             let text  = rawText;
             let start = srtCombine.parseSrtTime(block[1].split(' --> ')[0])
             let end = srtCombine.parseSrtTime(block[1].split(' --> ')[1])
-            return createNewCue(start, end, text, side);
+            return new Cue(start, end, text, side);
         })
 
         return mapped;

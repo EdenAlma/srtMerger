@@ -1,17 +1,17 @@
-import { resizeCue, shiftCue, isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, mergeCues, splitCues, alignCues } from "./model.js"
+import { isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, mergeCues, splitCues, alignCues, getCue } from "./model.js"
 
 let mouseUpHandler;
 let mouseMoveHandler;
 
 
-function onKeyDown(event){
-  if(event.key === 's'){
+function onKeyDown(event) {
+  if (event.key === 's') {
     splitCues();
-  }else if(event.key === 'm'){
+  } else if (event.key === 'm') {
     mergeCues();
-  }else if(event.key === 'a'){
+  } else if (event.key === 'a') {
     alignCues();
-  }else{
+  } else {
     return;
   }
 }
@@ -22,15 +22,15 @@ function onMouseDown(event) {
   const clickedCue = event.target.closest('.cue'); //cue element that was click
   const clickYPosition = event.clientY; //initial y position clicked
 
-  if (clickedCue) { //must be element within a cue
 
+  if (clickedCue) { //must be element within a cue
     const cueTop = parseInt(clickedCue.style.top); //top position of the clicked cue
     const cueHeight = parseInt(clickedCue.style.height);
     mouseUpHandler = (event) => onMouseUp(event, clickedElement, clickYPosition)
     mouseMoveHandler = (event) => onMouseMove(event, clickedElement, clickYPosition, cueTop, cueHeight)
   } else {
     commitTextEdits();
-    window.addEventListener('keydown',onKeyDown)
+    window.addEventListener('keydown', onKeyDown)
     return;
   }
 
@@ -39,8 +39,7 @@ function onMouseDown(event) {
 }
 
 function onMouseUp(event, initialClicked, initialYPosition) {
-  let unclickedElement = event.target.closest('.cue');
-  if (!unclickedElement) unclickedElement = initialClicked
+  let clickedCueElement = event.target.closest('.cue');
 
   if (event.clientY === initialYPosition) {
     handleSingleClick(initialClicked)
@@ -52,10 +51,15 @@ function onMouseUp(event, initialClicked, initialYPosition) {
   window.removeEventListener('mousemove', mouseMoveHandler)
   window.removeEventListener('mouseup', mouseUpHandler)
   const shiftAmount = event.clientY - initialYPosition;
+  const cueToUpdate = getCue(clickedCueElement.id);
   if (initialClicked.classList.contains('resize-handle')) {
-    resizeCue(initialClicked, shiftAmount);
+    if (initialClicked.classList.contains('top-handle')) {
+      cueToUpdate.resizeTop(shiftAmount);
+    } else {
+      cueToUpdate.resizeBottom(shiftAmount);
+    }
   } else {
-    shiftCue(initialClicked, shiftAmount);
+    cueToUpdate.shiftCue(shiftAmount);
   }
 }
 
@@ -137,7 +141,7 @@ function updateCueElementSize(clickedElement, startTop, startHeight, shift) {
 
 
 function handleDoubleClick(event, clickedCue) {
-  window.removeEventListener('keydown',onKeyDown);
+  window.removeEventListener('keydown', onKeyDown);
   editCueText(clickedCue.id);
   const textE = clickedCue.querySelector('.cue-text');
   clickedCue.classList.add('edited')

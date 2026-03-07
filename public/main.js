@@ -1,7 +1,7 @@
 import { srtCombine } from "./srtCombine.js"
 import { addEvents } from "./events.js"
 import { renderSrt } from "./render.js";
-import { srtData, thresh, splitCue } from "./model.js";
+import { srtData, thresh, Cue} from "./model.js";
 
 const mergeBtn = document.getElementById('mergeBtn');
 let cps;
@@ -30,7 +30,7 @@ mergeBtn.addEventListener('click', async () => {
           || srtData[x].startTime > c.startTime && srtData[x].startTime < c.endTime)
     })
     if (check) {
-      splitCue(srtData[x])
+      srtData[x].split();
     }
     x++;
   }

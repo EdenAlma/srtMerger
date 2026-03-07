@@ -22,7 +22,7 @@ function renderCue(cue) {
     div.style.height = cue.duration / pixelMultiplier + 'px';
     div.innerHTML = `
       <div class="resize-handle top-handle"></div>
-      <span class="cue-text">${cue.rawText}</span>
+      <span class="cue-text">${cue.text}</span>
       <div class="resize-handle bottom-handle"></div>
       <div class="action-button hidden"></div>
     `;

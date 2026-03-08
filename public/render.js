@@ -42,6 +42,7 @@ function renderCue(cue) {
 
 
 function updateCueRender(cue) {
+    cue.refreshStats();
     const div = document.getElementById(cue.id)
     div.parentNode.removeChild(div);
     renderCue(cue);

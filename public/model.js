@@ -49,7 +49,7 @@ function selectCue(id) {
  */
 function unSelectCue(id) {
     const index = selectedElements.findIndex(e => e.id === id)
-    selectedElements.splice(index)
+    selectedElements.splice(index, 1)
 }
 
 /**
@@ -85,7 +85,7 @@ function mergeCues() {
     let next = firstElement.getNext(true);
     if (next != selectedElements[1]) return;
     let newCue = selectedElements[0];
-    let newText = selectedElements[0].text + selectedElements[1].text;
+    let newText = selectedElements[0].text + ' ' + selectedElements[1].text;
     newCue.text = newText;
     newCue.endTime = selectedElements[1].endTime;
     newCue.duration = newCue.endTime - newCue.startTime;
@@ -94,7 +94,6 @@ function mergeCues() {
     selectedElements.splice(0);
     updateCueRender(newCue);
 }
-
 
 
 /**
@@ -136,34 +135,27 @@ class Cue {
     resizeTop(shiftAmount) {
         let { min, max } = this.getLimits();
         let shift = shiftAmount * pixelMultiplier;
-        let newEnd, newDuration, newStart;
+        let newDuration, newStart;
         newStart = Math.max((this.startTime + shift), min);
         newDuration = this.endTime - newStart;
         if (newDuration > 100) {
             this.duration = newDuration;
-            if (newStart) {
-                this.startTime = newStart;
-            } else {
-                this.endTime = newEnd;
-            }
+            this.startTime = newStart;
         }
-
         updateCueRender(this)
     }
 
     resizeBottom(shiftAmount) {
         let { min, max } = this.getLimits();
         let shift = shiftAmount * pixelMultiplier;
-        let newEnd, newDuration, newStart;
+        let newEnd, newDuration;
         newEnd = Math.min((this.endTime + shift), max);
         newDuration = newEnd - this.startTime;
-
         if (newDuration > 100) {
             this.duration = newDuration;
             this.endTime = newEnd;
-        } else {
-            return
-        }
+        } 
+
         updateCueRender(this)
     }
 
@@ -247,7 +239,7 @@ class Cue {
             let start = Math.min(this.startTime, next.startTime)
             start = Math.max(start, next.getLimits().min, this.getLimits().min)
             let end = Math.max(this.endTime, next.endTime)
-            end = Math.min(end, next.getLimits().max,this.getLimits().max)
+            end = Math.min(end, next.getLimits().max, this.getLimits().max)
             this.updateCue(start, end, this.text, this.side)
             next.updateCue(start, end, next.text, next.side)
             this.matched = true;
@@ -266,6 +258,11 @@ class Cue {
         this.duration = end - start;
         this.cps = this.textLength / (this.duration * 1000) //ms to second
         this.matched = false;
+    }
+
+    refreshStats(){
+        this.textLength = this.text.replaceAll(tagPattern, '').length;
+        this.cps = this.textLength / (this.duration * 1000)
     }
 
     add() {
@@ -296,8 +293,7 @@ class Cue {
                     || this.startTime > c.startTime && this.startTime < c.endTime)
         })
 
-        if (check) return true;
-        return false
+        return check ? true : false;
     }
 }
 

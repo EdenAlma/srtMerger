@@ -8,7 +8,20 @@
     <script type="module" src="main.js"></script>
 </head>
 <body>
-    <div class="topbar"></div>
+    <div class="topbar">
+        <div class="bar-option">Load
+            <div class="bar-option-expand">.srt</div>
+            <div class="bar-option-expand">.json</div>
+        </div>
+        <div class="bar-option">Save
+            <div class="bar-option-expand">.srt</div>
+            <div class="bar-option-expand">.json</div>
+        </div>
+        <div class="bar-option">Add</div>
+        <div class="bar-option">Delete</div>
+        <div class="progress-bar" id="progress-bar">0%</div>
+    </div>
+    <div style="margin-top: 20px;">
     <input type="file" id="srt1" />
     <input type="file" id="srt2" />
     <label for="threshold">Threshold</label>
@@ -18,6 +31,7 @@
     <label for="cpl">Character/line</label>
     <input type="number" id="cpl" value="42">
     <button id="mergeBtn">Merge</button>
+    </div>
     <div id ="srtContainer">
         <div id="left"></div>
         <div id="right"></div>

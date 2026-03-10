@@ -1,4 +1,4 @@
-import { pixelMultiplier } from "./model.js";
+import { pixelMultiplier, cps} from "./model.js";
 
 function renderSrt(cues) {
 
@@ -32,6 +32,13 @@ function renderCue(cue) {
     } else {
         div.classList.remove('matched')
     }
+
+    if(cue.cps > cps.value){
+        div.classList.add('cps-flag')
+    }else{
+        div.classList.remove('cps-flag')
+    }
+
     if (cue.side === 'left') {
         left.appendChild(div);
     } else {
@@ -54,7 +61,12 @@ function deleteCueRender(id){
     div.parentNode.removeChild(div);
 }
 
+function updateProgress(pct){
+    let progBar = document.getElementById("progress-bar");
+    let width = 80*pct;
+    progBar.style.width = width+"%";
+    progBar.innerHTML = pct+"%";
+}
 
 
-
-export { renderSrt, updateCueRender, renderCue, deleteCueRender};
+export { renderSrt, updateCueRender, renderCue, deleteCueRender, updateProgress};

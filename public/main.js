@@ -1,10 +1,9 @@
 import { srtCombine } from "./srtCombine.js"
 import { addEvents } from "./events.js"
 import { renderSrt } from "./render.js";
-import { srtData, thresh} from "./model.js";
+import { srtData, thresh, cps} from "./model.js";
 
 const mergeBtn = document.getElementById('mergeBtn');
-let cps;
 let cpl;
 
 
@@ -14,7 +13,7 @@ mergeBtn.addEventListener('click', async () => {
   let temp = await srtCombine.getCombinedSrt(srt1File, srt2File);
   thresh.value = document.getElementById("threshold").value;
   srtData.push(...temp)
-  cps = document.getElementById("cps").value;
+  cps.value = document.getElementById("cps").value;
   cpl = document.getElementById("cpl").value;
   //const root = document.documentElement;
   //root.style.setProperty('--extend', thresh + 'px');

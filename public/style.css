@@ -10,23 +10,51 @@ body {
 
 .topbar{
     height: 20px;
-    background-color: black;
+    background-color: rgb(179, 174, 174);
+    display: flex;
+    position: fixed; 
+    top: 0;
+    left: 0;         
+    width: 100%;
+    z-index: 9999;
+}
+
+.bar-option{
+    position: relative;
+    width: 5%;
+    background-color: inherit;
+}
+
+.bar-option-expand{
+    display: none;
+    position: relative;
+    background-color: inherit;
+    left: 5%;
+
+}
+
+.bar-option:hover .bar-option-expand{
+    display: block;
 }
 
 #srtContainer {
     display: flex;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.progress-bar{
+    background-color: green;
+    width: 0%;
 }
 
 #left {
     position: relative;
-    font-family: cursive;
     width: 50%;
 }
 
 
 #right {
     position: relative;
-    font-family: sans-serif;
     width: 50%;
 }
 
@@ -46,7 +74,11 @@ body {
     background-color: greenyellow;
 }
 
-:hover .cue{
+.cps-flag{
+    border-color: red;
+}
+
+:hover.cue{
     cursor: move;
 }
 
@@ -96,6 +128,6 @@ body {
     visibility: hidden;
 }
 
-:hover .resize-handle {
+:hover.resize-handle {
     cursor: n-resize;
 }

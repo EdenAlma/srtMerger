@@ -1,12 +1,12 @@
-import { updateCueRender, renderCue, deleteCueRender } from "./render.js";
+import { updateCueRender, renderCue, deleteCueRender, updateProgress } from "./render.js";
 let thresh = { "value": 0 };
+let cps = {"value": 0};
 const srtData = [];
 const selectedElements = []
 const editedElements = []
 const pixelMultiplier = 40;
 const tagPattern = new RegExp("<[a-z]+>|</[a-z]+>", "g");
-
-export { thresh, srtData, selectedElements }
+export { thresh, srtData, selectedElements, cps};
 
 
 /**
@@ -104,6 +104,9 @@ function alignCues() {
     for (let i = 0; i < cueCount; i++) {
         srtData[i].alignCue();
     }
+    let matched = srtData.filter(e => e.matched === true)
+    let percentMatched = (matched.length/srtData.length).toFixed(2);
+    updateProgress(percentMatched);
 }
 
 function getCue(id) {
@@ -123,7 +126,7 @@ class Cue {
         this.startTime = start;
         this.endTime = end;
         this.duration = end - start;
-        this.cps = this.textLength / (this.duration * 1000)
+        this.cps = this.textLength / (this.duration / 1000)
         this.matched = false;
         if (id) {
             this.id = id;
@@ -262,7 +265,7 @@ class Cue {
 
     refreshStats(){
         this.textLength = this.text.replaceAll(tagPattern, '').length;
-        this.cps = this.textLength / (this.duration * 1000)
+        this.cps = this.textLength / (this.duration / 1000)
     }
 
     add() {

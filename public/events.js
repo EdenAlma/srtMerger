@@ -1,4 +1,5 @@
-import { isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, mergeCues, splitCues, alignCues, getCue } from "./model.js"
+import { isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, 
+  mergeCues, splitCues, alignCues, getCue, unselectAll} from "./model.js"
 
 let mouseUpHandler;
 let mouseMoveHandler;
@@ -30,6 +31,7 @@ function onMouseDown(event) {
     mouseMoveHandler = (event) => onMouseMove(event, clickedElement, clickYPosition, cueTop, cueHeight)
   } else {
     commitTextEdits();
+    unselectAll();
     window.addEventListener('keydown', onKeyDown)
     return;
   }
@@ -55,11 +57,14 @@ function onMouseUp(event, initialClicked, initialYPosition) {
   if (initialClicked.classList.contains('resize-handle')) {
     if (initialClicked.classList.contains('top-handle')) {
       cueToUpdate.resizeTop(shiftAmount);
+      cueToUpdate.alignCue();
     } else {
       cueToUpdate.resizeBottom(shiftAmount);
+      cueToUpdate.alignCue();
     }
   } else {
     cueToUpdate.shiftCue(shiftAmount);
+    cueToUpdate.alignCue();
   }
 }
 

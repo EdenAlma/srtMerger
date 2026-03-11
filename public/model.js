@@ -1,12 +1,12 @@
-import { updateCueRender, renderCue, deleteCueRender, updateProgress } from "./render.js";
+import { updateCueRender, renderCue, deleteCueRender, updateProgress, unselectAllRender } from "./render.js";
 let thresh = { "value": 0 };
-let cps = {"value": 0};
+let cps = { "value": 0 };
 const srtData = [];
 const selectedElements = []
 const editedElements = []
 const pixelMultiplier = 40;
 const tagPattern = new RegExp("<[a-z]+>|</[a-z]+>", "g");
-export { thresh, srtData, selectedElements, cps};
+export { thresh, srtData, selectedElements, cps };
 
 
 /**
@@ -105,7 +105,7 @@ function alignCues() {
         srtData[i].alignCue();
     }
     let matched = srtData.filter(e => e.matched === true)
-    let percentMatched = (matched.length/srtData.length).toFixed(2);
+    let percentMatched = (matched.length / srtData.length).toFixed(2);
     updateProgress(percentMatched);
 }
 
@@ -157,7 +157,7 @@ class Cue {
         if (newDuration > 100) {
             this.duration = newDuration;
             this.endTime = newEnd;
-        } 
+        }
 
         updateCueRender(this)
     }
@@ -235,7 +235,11 @@ class Cue {
 
     alignCue() {
         let next = this.getNext(false)
-        if (!next) return;
+        if (!next) {
+            this.matched = false;
+            updateCueRender(this);
+            return;
+        }
         let startGap = Math.abs(next.startTime - this.startTime)
         let endGap = Math.abs(next.endTime - this.endTime)
         if (startGap < thresh.value && endGap < thresh.value) {
@@ -247,9 +251,12 @@ class Cue {
             next.updateCue(start, end, next.text, next.side)
             this.matched = true;
             next.matched = true;
-            updateCueRender(this);
-            updateCueRender(next);
+        } else {
+            this.matched = false;
+            next.matched = false;
         }
+        updateCueRender(this);
+        updateCueRender(next);
     }
 
     updateCue(start, end, text, side) {
@@ -263,7 +270,7 @@ class Cue {
         this.matched = false;
     }
 
-    refreshStats(){
+    refreshStats() {
         this.textLength = this.text.replaceAll(tagPattern, '').length;
         this.cps = this.textLength / (this.duration / 1000)
     }
@@ -300,5 +307,10 @@ class Cue {
     }
 }
 
+function unselectAll() {
+    selectedElements.splice(0);
+    unselectAllRender();
+}
 
-export { isSelected, selectCue, unSelectCue, editCueText, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues, Cue, getCue }
+
+export { isSelected, selectCue, unSelectCue, editCueText, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues, Cue, getCue, unselectAll }

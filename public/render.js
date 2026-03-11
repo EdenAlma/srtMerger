@@ -1,4 +1,4 @@
-import { pixelMultiplier, cps} from "./model.js";
+import { pixelMultiplier, cps } from "./model.js";
 
 function renderSrt(cues) {
 
@@ -33,9 +33,9 @@ function renderCue(cue) {
         div.classList.remove('matched')
     }
 
-    if(cue.cps > cps.value){
+    if (cue.cps > cps.value) {
         div.classList.add('cps-flag')
-    }else{
+    } else {
         div.classList.remove('cps-flag')
     }
 
@@ -56,17 +56,25 @@ function updateCueRender(cue) {
 }
 
 
-function deleteCueRender(id){
+function deleteCueRender(id) {
     const div = document.getElementById(id)
     div.parentNode.removeChild(div);
 }
 
-function updateProgress(pct){
+function updateProgress(pct) {
     let progBar = document.getElementById("progress-bar");
-    let width = 80*pct;
-    progBar.style.width = width+"%";
-    progBar.innerHTML = pct+"%";
+    let width = 80 * pct;
+    progBar.style.width = width + "%";
+    progBar.innerHTML = (pct * 100).toFixed(2) + "%";
+}
+
+function unselectAllRender() {
+    let selectedElements = document.getElementsByClassName('selected');
+    while (selectedElements.length > 0)
+        selectedElements[0].classList.remove('selected');
 }
 
 
-export { renderSrt, updateCueRender, renderCue, deleteCueRender, updateProgress};
+
+
+export { renderSrt, updateCueRender, renderCue, deleteCueRender, updateProgress, unselectAllRender };

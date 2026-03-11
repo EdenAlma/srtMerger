@@ -304,6 +304,8 @@ class Cue {
         cue2.add();
         updateCueRender(cue1);
         renderCue(cue2);
+        cue1.alignCue();
+        cue2.alignCue();
     }
 
     getOverlap() {

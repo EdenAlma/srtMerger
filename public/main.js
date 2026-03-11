@@ -28,6 +28,7 @@ mergeBtn.addEventListener('click', async () => {
     x++;
   }
   addEvents();
+  alignCues();
   mergeBtn.parentNode.removeChild(mergeBtn);
 })
 

@@ -1,7 +1,7 @@
 import { srtCombine } from "./srtCombine.js"
 import { addEvents } from "./events.js"
 import { renderSrt } from "./render.js";
-import { srtData, thresh, cps} from "./model.js";
+import { srtData, thresh, cps, alignCues} from "./model.js";
 
 const mergeBtn = document.getElementById('mergeBtn');
 let cpl;
@@ -23,14 +23,14 @@ mergeBtn.addEventListener('click', async () => {
   //split all the cue ---> add something to not split if theres no corresponding one 
   while (x < srtData.length) {
 
-
-    if (srtData[x].hasNeighbor()) {
+    if (srtData[x].hasOverlap()) {
       srtData[x].split();
     }
     x++;
   }
 
   mergeBtn.parentNode.removeChild(mergeBtn);
+  alignCues();
 })
 
 

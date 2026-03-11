@@ -1,5 +1,5 @@
 import { isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, 
-  mergeCues, splitCues, alignCues, getCue, unselectAll} from "./model.js"
+  mergeCues, splitCues, getCue, unselectAll} from "./model.js"
 
 let mouseUpHandler;
 let mouseMoveHandler;
@@ -10,8 +10,6 @@ function onKeyDown(event) {
     splitCues();
   } else if (event.key === 'm') {
     mergeCues();
-  } else if (event.key === 'a') {
-    alignCues();
   } else {
     return;
   }
@@ -57,14 +55,11 @@ function onMouseUp(event, initialClicked, initialYPosition) {
   if (initialClicked.classList.contains('resize-handle')) {
     if (initialClicked.classList.contains('top-handle')) {
       cueToUpdate.resizeTop(shiftAmount);
-      cueToUpdate.alignCue();
     } else {
       cueToUpdate.resizeBottom(shiftAmount);
-      cueToUpdate.alignCue();
     }
   } else {
     cueToUpdate.shiftCue(shiftAmount);
-    cueToUpdate.alignCue();
   }
 }
 

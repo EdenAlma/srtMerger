@@ -92,6 +92,7 @@ function mergeCues() {
     deleteCueRender(selectedElements[1].id);
     srtData.splice(srtData.findIndex(e => e.id === selectedElements[1].id), 1)
     selectedElements.splice(0);
+    newCue.alignCue();
     updateCueRender(newCue);
 }
 
@@ -111,6 +112,11 @@ function alignCues() {
 
 function getCue(id) {
     return srtData.find(e => e.id === id)
+}
+
+function unselectAll() {
+    selectedElements.splice(0);
+    unselectAllRender();
 }
 
 
@@ -145,6 +151,7 @@ class Cue {
             this.duration = newDuration;
             this.startTime = newStart;
         }
+        this.alignCue();
         updateCueRender(this)
     }
 
@@ -158,7 +165,7 @@ class Cue {
             this.duration = newDuration;
             this.endTime = newEnd;
         }
-
+        this.alignCue();
         updateCueRender(this)
     }
 
@@ -176,6 +183,7 @@ class Cue {
             this.endTime = newEnd;
             this.duration = newDuration;
         }
+        this.alignCue();
         updateCueRender(this)
     }
 
@@ -234,29 +242,29 @@ class Cue {
     }
 
     alignCue() {
-        let next = this.getNext(false)
-        if (!next) {
+
+        let neighbor = this.getNeighbor();
+        if (!neighbor) {
             this.matched = false;
             updateCueRender(this);
-            return;
-        }
-        let startGap = Math.abs(next.startTime - this.startTime)
-        let endGap = Math.abs(next.endTime - this.endTime)
-        if (startGap < thresh.value && endGap < thresh.value) {
-            let start = Math.min(this.startTime, next.startTime)
-            start = Math.max(start, next.getLimits().min, this.getLimits().min)
-            let end = Math.max(this.endTime, next.endTime)
-            end = Math.min(end, next.getLimits().max, this.getLimits().max)
-            this.updateCue(start, end, this.text, this.side)
-            next.updateCue(start, end, next.text, next.side)
-            this.matched = true;
-            next.matched = true;
+            let overlaps = this.getOverlap();
+            for(let i = 0; i < overlaps.length; i++){
+                overlaps[i].matched = false;
+                updateCueRender(overlaps[i]);
+            }
         } else {
-            this.matched = false;
-            next.matched = false;
+            let start = Math.min(this.startTime, neighbor.startTime)
+            start = Math.max(start, neighbor.getLimits().min, this.getLimits().min)
+            let end = Math.max(this.endTime, neighbor.endTime)
+            end = Math.min(end, neighbor.getLimits().max, this.getLimits().max)
+            this.updateCue(start, end, this.text, this.side)
+            neighbor.updateCue(start, end, neighbor.text, neighbor.side)
+            this.matched = true;
+            neighbor.matched = true;
+            updateCueRender(this);
+            updateCueRender(neighbor);
         }
-        updateCueRender(this);
-        updateCueRender(next);
+
     }
 
     updateCue(start, end, text, side) {
@@ -290,26 +298,45 @@ class Cue {
         let d1 = r1 * this.duration;
         let cue1 = new Cue(this.startTime, this.startTime + d1, cues[0], this.side, this.id)
         let cue2 = new Cue(this.startTime + d1 + 1, this.endTime, cues[1], this.side)
-        cue1.add()
-        cue2.add()
-        updateCueRender(cue1)
-        renderCue(cue2)
+        cue1.add();
+        cue2.add();
+    }
+
+    getOverlap() {
+        return srtData.filter(c => {
+            return c.side != this.side
+                && (c.startTime >= this.startTime && c.startTime <= this.endTime
+                    || this.startTime >= c.startTime && this.startTime <= c.endTime)
+        })
+    }
+
+
+    hasOverlap() {
+        return this.getOverlap().length > 0 ? true : false;
+    }
+
+    getNeighbor() {
+        let prev = this.getPrev(false);
+        let next = this.getNext(false);
+        if (!prev && !next) return null;
+        if (this.alignWith(prev)) return prev;;
+        if (this.alignWith(next)) return next;
     }
 
     hasNeighbor() {
-        let check = srtData.find(c => {
-            return c.side != this.side
-                && (c.startTime > this.startTime && c.startTime < this.endTime
-                    || this.startTime > c.startTime && this.startTime < c.endTime)
-        })
-
-        return check ? true : false;
+        return this.getNeighbor() ? true : false;
     }
-}
 
-function unselectAll() {
-    selectedElements.splice(0);
-    unselectAllRender();
+    alignWith(otherCue) {
+        if(!otherCue) return false;
+        let startGap = Math.abs(otherCue.startTime - this.startTime)
+        let endGap = Math.abs(otherCue.endTime - this.endTime)
+        if (startGap < thresh.value && endGap < thresh.value) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 

@@ -15,10 +15,9 @@ mergeBtn.addEventListener('click', async () => {
   srtData.push(...temp)
   cps.value = document.getElementById("cps").value;
   cpl = document.getElementById("cpl").value;
+  renderSrt(srtData);
   //const root = document.documentElement;
   //root.style.setProperty('--extend', thresh + 'px');
-  renderSrt(srtData);
-  addEvents();
   let x = 0;
   //split all the cue ---> add something to not split if theres no corresponding one 
   while (x < srtData.length) {
@@ -28,9 +27,8 @@ mergeBtn.addEventListener('click', async () => {
     }
     x++;
   }
-
+  addEvents();
   mergeBtn.parentNode.removeChild(mergeBtn);
-  alignCues();
 })
 
 

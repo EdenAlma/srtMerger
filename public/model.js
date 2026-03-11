@@ -285,8 +285,10 @@ class Cue {
 
     add() {
         let index = srtData.findIndex(e => e.id === this.id)
-        if (index > -1) srtData.splice(index, 1) //if it exists already, remove it
-        srtData.push(this)
+
+        if (index > -1) srtData[index] = this; //if it exists already, replace it
+        else srtData.push(this)
+
         srtData.sort((a, b) => { return a.startTime - b.startTime })
     }
 
@@ -300,6 +302,8 @@ class Cue {
         let cue2 = new Cue(this.startTime + d1 + 1, this.endTime, cues[1], this.side)
         cue1.add();
         cue2.add();
+        updateCueRender(cue1);
+        renderCue(cue2);
     }
 
     getOverlap() {

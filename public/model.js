@@ -105,9 +105,6 @@ function alignCues() {
     for (let i = 0; i < cueCount; i++) {
         srtData[i].alignCue();
     }
-    let matched = srtData.filter(e => e.matched === true)
-    let percentMatched = (matched.length / srtData.length).toFixed(2);
-    updateProgress(percentMatched);
 }
 
 function getCue(id) {
@@ -263,6 +260,9 @@ class Cue {
             neighbor.matched = true;
             updateCueRender(this);
             updateCueRender(neighbor);
+            let matched = srtData.filter(e => e.matched === true)
+            let percentMatched = (matched.length / srtData.length).toFixed(2);
+            updateProgress(percentMatched);
         }
 
     }

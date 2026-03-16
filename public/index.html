@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,34 +8,37 @@
     <link rel="stylesheet" href="style.css">
     <script type="module" src="main.js"></script>
 </head>
+
 <body>
     <div class="topbar">
+        <input type="file" id="json-file-input" style="display: none;"/>
         <div class="bar-option">Load
-            <div class="bar-option-expand">.srt</div>
-            <div class="bar-option-expand">.json</div>
+            <div id="load-srt" class="bar-option-expand">.srt</div>
+            <div id="load-json" class="bar-option-expand">.json</div>
         </div>
         <div class="bar-option">Save
-            <div class="bar-option-expand">.srt</div>
-            <div class="bar-option-expand">.json</div>
+            <div id="save-srt" class="bar-option-expand">.srt</div>
+            <div id="save-json" class="bar-option-expand">.json</div>
         </div>
         <div class="bar-option">Add</div>
         <div class="bar-option">Delete</div>
         <div class="progress-bar" id="progress-bar">0%</div>
     </div>
     <div style="margin-top: 20px;">
-    <input type="file" id="srt1" />
-    <input type="file" id="srt2" />
-    <label for="threshold">Threshold</label>
-    <input type="number" id="threshold" value="400">
-    <label for="cps">Character/second</label>
-    <input type="number" id="cps" value="14">
-    <label for="cpl">Character/line</label>
-    <input type="number" id="cpl" value="42">
-    <button id="mergeBtn">Merge</button>
+        <input type="file" id="srt1" />
+        <input type="file" id="srt2" />
+        <label for="threshold">Threshold</label>
+        <input type="number" id="threshold" value="400">
+        <label for="cps">Character/second</label>
+        <input type="number" id="cps" value="14">
+        <label for="cpl">Character/line</label>
+        <input type="number" id="cpl" value="42">
+        <button id="mergeBtn">Merge</button>
     </div>
-    <div id ="srtContainer">
+    <div id="srtContainer">
         <div id="left"></div>
         <div id="right"></div>
     </div>
 </body>
+
 </html>

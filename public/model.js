@@ -242,13 +242,18 @@ class Cue {
 
         let neighbor = this.getNeighbor();
         if (!neighbor) {
-            this.matched = false;
-            updateCueRender(this);
             let overlaps = this.getOverlap();
-            for(let i = 0; i < overlaps.length; i++){
-                overlaps[i].matched = false;
-                updateCueRender(overlaps[i]);
+            if (overlaps.length > 0) {
+                this.matched = false;
+                for (let i = 0; i < overlaps.length; i++) {
+                    overlaps[i].matched = false;
+                    updateCueRender(overlaps[i]);
+                }
+            } else {
+                this.matched = true;
             }
+            updateCueRender(this);
+
         } else {
             let start = Math.min(this.startTime, neighbor.startTime)
             start = Math.max(start, neighbor.getLimits().min, this.getLimits().min)
@@ -334,7 +339,7 @@ class Cue {
     }
 
     alignWith(otherCue) {
-        if(!otherCue) return false;
+        if (!otherCue) return false;
         let startGap = Math.abs(otherCue.startTime - this.startTime)
         let endGap = Math.abs(otherCue.endTime - this.endTime)
         if (startGap < thresh.value && endGap < thresh.value) {

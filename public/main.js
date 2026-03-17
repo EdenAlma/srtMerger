@@ -1,25 +1,45 @@
-import { srtCombine } from "./srtCombine.js"
 import { addEvents } from "./events.js"
 import { renderSrt } from "./render.js";
 import { srtData, thresh, cps, alignCues} from "./model.js";
+import { srtToCueJSON } from "./srtio.js";
 
-const mergeBtn = document.getElementById('mergeBtn');
 const saveJson = document.getElementById('save-json');
 const loadJson = document.getElementById('load-json');
-let cpl;
+const saveSrt = document.getElementById('save-srt');
+const loadSrt = document.getElementById('load-srt');
+const srtFileLeft = document.getElementById('srt-file-input-left');
+const srtFileRight = document.getElementById('srt-file-input-right');
 
 
-mergeBtn.addEventListener('click', async () => {
-  const srt1File = document.getElementById("srt1").files[0];
-  const srt2File = document.getElementById("srt2").files[0];
-  let temp = await srtCombine.getCombinedSrt(srt1File, srt2File);
-  thresh.value = document.getElementById("threshold").value;
-  srtData.push(...temp)
-  cps.value = document.getElementById("cps").value;
-  cpl = document.getElementById("cpl").value;
+loadSrt.addEventListener('click', async () => {
+  //get left file -> json
+  srtFileLeft.click();
+  let leftFile = await waitForFile(srtFileLeft);
+  let leftCues = await srtToCueJSON(leftFile, 'left')
+  //get right file -> json
+  srtFileRight.click();
+  let rightFile = await waitForFile(srtFileRight);
+  let rightCues = await srtToCueJSON(rightFile, 'right')
+  //combine into a single array and push into srtData
+  let comboArray = leftCues.concat(rightCues); 
+  comboArray.sort((a, b) => { return a.startTime - b.startTime })
+  srtData.push(...comboArray)
   renderSrt(srtData);
-  //const root = document.documentElement;
-  //root.style.setProperty('--extend', thresh + 'px');
+  splitAndAlign();
+  addEvents();
+})
+
+async function waitForFile(fileElement){
+  return new Promise(resolve => {
+    const handler = () => {
+      fileElement.removeEventListener('change', handler);
+      resolve(fileElement.files[0]);
+    };
+    fileElement.addEventListener('change', handler);
+  });
+}
+
+function splitAndAlign(){
   let x = 0;
   //split all the cue ---> add something to not split if theres no corresponding one 
   while (x < srtData.length) {
@@ -29,60 +49,5 @@ mergeBtn.addEventListener('click', async () => {
     }
     x++;
   }
-  addEvents();
   alignCues();
-  mergeBtn.parentNode.removeChild(mergeBtn);
-})
-
-saveJson.addEventListener('click', () => {
-  downloadFile(JSON.stringify(srtData, null, 2), 'project.json', "application/json");
-})
-
-
-function downloadFile(content, filename, type = "text/plain") {
-  const blob = new Blob([content], { type });
-
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-
-  document.body.appendChild(a);
-  a.click();
-
-  a.remove();
-  URL.revokeObjectURL(url);
 }
-
-
-
-
-const fileInput = document.getElementById("json-file-input");
-
-loadJson.addEventListener("click", () => {
-  fileInput.click(); // opens file picker
-});
-
-fileInput.addEventListener("change", async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  try {
-    const text = await file.text();
-    const data = JSON.parse(text);
-
-    srtData.splice(0);
-    srtData.push(...data)
-    renderSrt(srtData);
-    addEvents();
-    alignCues();
-
-  } catch (err) {
-    console.error("Invalid JSON file", err);
-  }
-
-  // reset input so the same file can be selected again
-  fileInput.value = "";
-});
-

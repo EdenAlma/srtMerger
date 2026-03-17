@@ -1,9 +1,9 @@
-import { pixelMultiplier, cps } from "./model.js";
+import { pixelMultiplier, cps, srtData } from "./model.js";
 
 function renderSrt(cues) {
 
-    for (const cue of cues) {
-        renderCue(cue);
+    for (let i = 0; i < cues.length; i++) {
+        renderCue(cues[i]);
     }
 
     //addPostRenderEvents();

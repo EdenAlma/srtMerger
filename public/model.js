@@ -1,6 +1,6 @@
 import { updateCueRender, renderCue, deleteCueRender, updateProgress, unselectAllRender } from "./render.js";
-let thresh = { "value": 0 };
-let cps = { "value": 0 };
+let thresh = { "value": 400 };
+let cps = { "value": 14 };
 const srtData = [];
 const selectedElements = []
 const editedElements = []

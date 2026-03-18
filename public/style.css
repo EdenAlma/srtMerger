@@ -78,6 +78,10 @@ body {
     border-color: red;
 }
 
+.cpl-flag{
+    text-decoration: underline;
+}
+
 :hover.cue{
     cursor: move;
 }

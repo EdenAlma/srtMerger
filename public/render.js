@@ -1,4 +1,4 @@
-import { pixelMultiplier, cps, srtData } from "./model.js";
+import { pixelMultiplier, cps, cpl } from "./model.js";
 
 function renderSrt(cues) {
 
@@ -39,6 +39,12 @@ function renderCue(cue) {
         div.classList.remove('cps-flag')
     }
 
+    if (cue.textLength > cpl.value) {
+        div.classList.add('cpl-flag')
+    } else {
+        div.classList.remove('cpl-flag')
+    }
+
     if (cue.side === 'left') {
         left.appendChild(div);
     } else {
@@ -77,5 +83,7 @@ function unselectAllRender() {
 
 
 
-export { renderSrt, updateCueRender, renderCue, deleteCueRender, updateProgressRender
-, unselectAllRender };
+export {
+    renderSrt, updateCueRender, renderCue, deleteCueRender, updateProgressRender
+    , unselectAllRender
+};

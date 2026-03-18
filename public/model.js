@@ -1,6 +1,7 @@
 import { updateCueRender, renderCue, deleteCueRender, updateProgressRender, unselectAllRender } from "./render.js";
 let thresh = { "value": 400 };
 let cps = { "value": 14 };
+let cpl = { "value": 40 };
 const srtData = [];
 const selectedElements = []
 const editedElements = []
@@ -8,7 +9,7 @@ const pixelMultiplier = 40;
 const tagPattern = new RegExp("<(?!(\\/?br\\b))[^>]*>", "g");
 const brPattern = new RegExp("^(<br\\s*\\/?>)+|(<br\\s*\\/?>)+$", "g");
 const nbspPattern = new RegExp("&nbsp;", "gi");
-export { thresh, srtData, selectedElements, cps };
+export { thresh, srtData, selectedElements, cps, cpl, pixelMultiplier};
 
 
 /**
@@ -21,7 +22,7 @@ function commitTextEdits() {
         let textSpan = document.getElementById(editedCue.id).querySelector('.cue-text');
         let updatedText = textSpan.innerHTML.replaceAll(brPattern, '');
         updatedText = updatedText.replaceAll(nbspPattern, ' ');
-        editedCue.text = updatedText;
+        editedCue.text = updatedText.trim();
         updateCueRender(editedCue);
         editedElements.splice(i, 1);
     }
@@ -288,6 +289,7 @@ class Cue {
     }
 
     refreshStats() {
+        this.textLength = this.text.length;
         this.cps = this.textLength / (this.duration / 1000)
     }
 
@@ -354,4 +356,4 @@ class Cue {
 }
 
 
-export { isSelected, selectCue, unSelectCue, editCueText, commitTextEdits, pixelMultiplier, mergeCues, splitCues, alignCues, Cue, getCue, unselectAll }
+export { isSelected, selectCue, unSelectCue, editCueText, commitTextEdits, mergeCues, splitCues, alignCues, Cue, getCue, unselectAll }

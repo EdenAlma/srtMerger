@@ -5,7 +5,7 @@ const srtData = [];
 const selectedElements = []
 const editedElements = []
 const pixelMultiplier = 40;
-const tagPattern = new RegExp("<[a-z]+>|</[a-z]+>", "g");
+const tagPattern = new RegExp("<(?!(\\/?br\\b))[^>]*>", "g");
 const brPattern = new RegExp("^(<br\\s*\\/?>)+|(<br\\s*\\/?>)+$", "g");
 export { thresh, srtData, selectedElements, cps };
 
@@ -18,7 +18,7 @@ function commitTextEdits() {
     for (; i >= 0; i--) {
         let editedCue = editedElements[i];
         let textSpan = document.getElementById(editedCue.id).querySelector('.cue-text');
-        let updatedText = textSpan.innerHTML;
+        let updatedText = textSpan.innerHTML.replaceAll(brPattern, '');
         editedCue.text = updatedText;
         updateCueRender(editedCue);
         editedElements.splice(i, 1);
@@ -125,8 +125,8 @@ class Cue {
 
     constructor(start, end, text, side, id) {
         this.side = side
-        this.text = text;
-        this.textLength = this.text.replaceAll(tagPattern, '').length;
+        this.text = text.replaceAll(tagPattern, '');
+        this.textLength = this.text.length;
         this.startTime = start;
         this.endTime = end;
         this.duration = end - start;
@@ -275,8 +275,8 @@ class Cue {
 
     updateCue(start, end, text, side) {
         this.side = side
-        this.text = text;
-        this.textLength = this.text.replaceAll(tagPattern, '').length;
+        this.text = text.replaceAll(tagPattern, '');
+        this.textLength = this.text.length;
         this.startTime = start;
         this.endTime = end;
         this.duration = end - start;
@@ -285,7 +285,6 @@ class Cue {
     }
 
     refreshStats() {
-        this.textLength = this.text.replaceAll(tagPattern, '').length;
         this.cps = this.textLength / (this.duration / 1000)
     }
 

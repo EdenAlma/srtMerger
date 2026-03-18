@@ -6,6 +6,7 @@ const selectedElements = []
 const editedElements = []
 const pixelMultiplier = 40;
 const tagPattern = new RegExp("<[a-z]+>|</[a-z]+>", "g");
+const brPattern = new RegExp("^(<br\\s*\\/?>)+|(<br\\s*\\/?>)+$", "g");
 export { thresh, srtData, selectedElements, cps };
 
 

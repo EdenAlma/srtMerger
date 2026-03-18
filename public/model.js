@@ -7,6 +7,7 @@ const editedElements = []
 const pixelMultiplier = 40;
 const tagPattern = new RegExp("<(?!(\\/?br\\b))[^>]*>", "g");
 const brPattern = new RegExp("^(<br\\s*\\/?>)+|(<br\\s*\\/?>)+$", "g");
+const nbspPattern = new RegExp("&nbsp;", "gi");
 export { thresh, srtData, selectedElements, cps };
 
 
@@ -19,6 +20,7 @@ function commitTextEdits() {
         let editedCue = editedElements[i];
         let textSpan = document.getElementById(editedCue.id).querySelector('.cue-text');
         let updatedText = textSpan.innerHTML.replaceAll(brPattern, '');
+        updatedText = updatedText.replaceAll(nbspPattern, ' ');
         editedCue.text = updatedText;
         updateCueRender(editedCue);
         editedElements.splice(i, 1);
@@ -88,6 +90,7 @@ function mergeCues() {
     let newCue = selectedElements[0];
     let newText = selectedElements[0].text + ' ' + selectedElements[1].text;
     newCue.text = newText;
+    newCue.textLength = newCue.text.length;
     newCue.endTime = selectedElements[1].endTime;
     newCue.duration = newCue.endTime - newCue.startTime;
     deleteCueRender(selectedElements[1].id);

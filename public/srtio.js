@@ -46,25 +46,15 @@ async function srtToCueJSON(path, side) {
 }
 
 
-async function loadJson(file) {
-    if (!file) return;
-
-    try {
-        const text = await file.text();
-        const data = JSON.parse(text);
-
-        srtData.splice(0);
-        srtData.push(...data)
-        renderSrt(srtData);
-        addEvents();
-        alignCues();
-
-    } catch (err) {
-        console.error("Invalid JSON file", err);
+async function jsonToCue(cueJson) {
+    srtData.splice(0);
+    for(let i=0; i<cueJson.length; i++){
+        let {side, text, textLength, startTime, endTime, duration, cps, matched, id} = cueJson[i];
+        let cue = new Cue(startTime, endTime, text, side, id);
+        cue.matched = matched;
+        cue.refreshStats();
+        srtData.push(cue)
     }
-
-    // reset input so the same file can be selected again
-    fileInput.value = "";
 }
 
 
@@ -85,4 +75,4 @@ function downloadFile(content, filename, type = "text/plain") {
 }
 
 
-export {srtToCueJSON}; 
+export {srtToCueJSON, downloadFile, jsonToCue}; 

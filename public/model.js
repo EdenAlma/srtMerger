@@ -1,4 +1,4 @@
-import { updateCueRender, renderCue, deleteCueRender, updateProgress, unselectAllRender } from "./render.js";
+import { updateCueRender, renderCue, deleteCueRender, updateProgressRender, unselectAllRender } from "./render.js";
 let thresh = { "value": 400 };
 let cps = { "value": 14 };
 const srtData = [];
@@ -266,8 +266,8 @@ class Cue {
             updateCueRender(this);
             updateCueRender(neighbor);
             let matched = srtData.filter(e => e.matched === true)
-            let percentMatched = (matched.length / srtData.length).toFixed(2);
-            updateProgress(percentMatched);
+            let percentMatched = (matched.length / srtData.length).toFixed(4);
+            updateProgressRender(percentMatched);
         }
 
     }

@@ -61,7 +61,7 @@ function deleteCueRender(id) {
     div.parentNode.removeChild(div);
 }
 
-function updateProgress(pct) {
+function updateProgressRender(pct) {
     let progBar = document.getElementById("progress-bar");
     let width = 80 * pct;
     progBar.style.width = width + "%";
@@ -77,4 +77,5 @@ function unselectAllRender() {
 
 
 
-export { renderSrt, updateCueRender, renderCue, deleteCueRender, updateProgress, unselectAllRender };
+export { renderSrt, updateCueRender, renderCue, deleteCueRender, updateProgressRender
+, unselectAllRender };

@@ -1,5 +1,6 @@
 import { isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, 
-  mergeCues, splitCues, getCue, unselectAll} from "./model.js"
+  mergeCues, splitCues, getCue, unselectAll,
+  deleteCues} from "./model.js"
 
 let mouseUpHandler;
 let mouseMoveHandler;
@@ -10,6 +11,8 @@ function onKeyDown(event) {
     splitCues();
   } else if (event.key === 'm') {
     mergeCues();
+  } else if (event.key === 'Delete'){
+    deleteCues();
   } else {
     return;
   }

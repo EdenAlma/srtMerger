@@ -1,6 +1,6 @@
 import { addEvents } from "./events.js"
-import { renderSrt } from "./render.js";
-import { srtData, thresh, cps, alignCues } from "./model.js";
+import { renderSrt} from "./render.js";
+import { srtData, thresh, cps, alignCues, updateProgress } from "./model.js";
 import { srtToCueJSON, downloadFile, jsonToCue } from "./srtio.js";
 
 const saveJson = document.getElementById('save-json');
@@ -69,6 +69,7 @@ loadJson.addEventListener('click', async () => {
     const jsonObj = JSON.parse(text);
     jsonToCue(jsonObj);
     renderSrt(srtData);
+    updateProgress();
     addEvents();
   } catch (err) {
     console.error('Error loading JSON:', err);

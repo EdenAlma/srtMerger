@@ -9,7 +9,7 @@ const pixelMultiplier = 40;
 const tagPattern = new RegExp("<(?!(\\/?br\\b))[^>]*>", "g");
 const brPattern = new RegExp("^(<br\\s*\\/?>)+|(<br\\s*\\/?>)+$", "g");
 const nbspPattern = new RegExp("&nbsp;", "gi");
-export { thresh, srtData, selectedElements, cps, cpl, pixelMultiplier};
+export { thresh, srtData, selectedElements, cps, cpl, pixelMultiplier };
 
 
 /**
@@ -119,6 +119,20 @@ function getCue(id) {
 function unselectAll() {
     selectedElements.splice(0);
     unselectAllRender();
+}
+
+function updateProgress() {
+    let matched = srtData.filter(e => e.matched === true)
+    let percentMatched = (matched.length / srtData.length).toFixed(4);
+    updateProgressRender(percentMatched);
+}
+
+function deleteCues() {
+    let i = selectedElements.length - 1
+    for (; i >= 0; i--) {
+        selectedElements[i].deleteCue();
+        selectedElements.splice(i, 1);
+    }
 }
 
 
@@ -270,9 +284,7 @@ class Cue {
             neighbor.matched = true;
             updateCueRender(this);
             updateCueRender(neighbor);
-            let matched = srtData.filter(e => e.matched === true)
-            let percentMatched = (matched.length / srtData.length).toFixed(4);
-            updateProgressRender(percentMatched);
+            updateProgress();
         }
 
     }
@@ -353,7 +365,17 @@ class Cue {
             return false;
         }
     }
+
+    deleteCue() {
+        deleteCueRender(this.id);
+        srtData.splice(srtData.findIndex(e => e.id === this.id), 1)
+        updateProgress();
+    }
 }
 
 
-export { isSelected, selectCue, unSelectCue, editCueText, commitTextEdits, mergeCues, splitCues, alignCues, Cue, getCue, unselectAll }
+export {
+    isSelected, selectCue, unSelectCue, editCueText, commitTextEdits,
+    mergeCues, splitCues, alignCues, Cue, getCue, unselectAll, updateProgress,
+    deleteCues
+}

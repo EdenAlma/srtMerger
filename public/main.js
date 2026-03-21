@@ -1,7 +1,7 @@
 import { addEvents } from "./events.js"
-import { renderSrt} from "./render.js";
+import { renderSrt } from "./render.js";
 import { srtData, thresh, cps, alignCues, updateProgress } from "./model.js";
-import { srtToCueJSON, downloadFile, jsonToCue } from "./srtio.js";
+import { srtToCueJSON, downloadFile, jsonToCue, createSrt } from "./srtio.js";
 
 const saveJson = document.getElementById('save-json');
 const loadJson = document.getElementById('load-json');
@@ -60,7 +60,7 @@ saveJson.addEventListener('click', () => {
 
 loadJson.addEventListener('click', async () => {
   jsonFileInput.click();
-    try {
+  try {
     // Wait for the user to select a file
     const jsonFile = await waitForFile(jsonFileInput);
     // Read the file as text
@@ -74,4 +74,10 @@ loadJson.addEventListener('click', async () => {
   } catch (err) {
     console.error('Error loading JSON:', err);
   }
+})
+
+saveSrt.addEventListener('click', async () => {
+  let fileName = prompt("Enter file name (without extension):", "data");
+  if (!fileName) fileName = "data"; // fallback if user cancels or enters nothing
+  downloadFile(createSrt(), fileName + '.srt', "text/srt")
 })

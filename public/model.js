@@ -7,7 +7,7 @@ const selectedElements = []
 const editedElements = []
 const pixelMultiplier = 40;
 const tagPattern = new RegExp("<(?!(\\/?br\\b))[^>]*>", "g");
-const brPattern = new RegExp("^(<br\\s*\\/?>)+|(<br\\s*\\/?>)+$", "g");
+const brPattern = new RegExp("(<br\\s*\\/?>)+|(<br\\s*\\/?>)+", "g");
 const nbspPattern = new RegExp("&nbsp;", "gi");
 export { thresh, srtData, selectedElements, cps, cpl, pixelMultiplier };
 
@@ -123,7 +123,7 @@ function unselectAll() {
 
 function updateProgress() {
     let matched = srtData.filter(e => e.matched === true)
-    let percentMatched = (matched.length / srtData.length).toFixed(4);
+    let percentMatched = (matched.length / srtData.length).toFixed(8);
     updateProgressRender(percentMatched);
 }
 
@@ -135,6 +135,17 @@ function deleteCues() {
     }
 }
 
+function msToSrtTime(ms) {
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    const milliseconds = ms % 1000;
+
+    const pad = (num, size) => String(num).padStart(size, '0');
+
+    return `${pad(hours, 2)}:${pad(minutes, 2)}:${pad(seconds, 2)},${pad(Math.round(milliseconds), 3)}`;
+}
+
 
 /**
  * Class representing SRT cue
@@ -143,7 +154,11 @@ class Cue {
 
     constructor(start, end, text, side, id) {
         this.side = side
-        this.text = text.replaceAll(tagPattern, '');
+        if(side === 'merged'){
+            this.text = text;
+        }else{
+            this.text = text.replaceAll(tagPattern, '');
+        }
         this.textLength = this.text.length;
         this.startTime = start;
         this.endTime = end;
@@ -370,6 +385,14 @@ class Cue {
         deleteCueRender(this.id);
         srtData.splice(srtData.findIndex(e => e.id === this.id), 1)
         updateProgress();
+    }
+
+    toString() {
+        let output = '';
+        output += (msToSrtTime(this.startTime) + ' --> ' + msToSrtTime(this.endTime));
+        output += '\r\n';
+        output += this.text.replaceAll(brPattern, '\r\n');
+        return output;
     }
 }
 

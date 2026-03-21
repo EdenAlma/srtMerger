@@ -1,6 +1,7 @@
 import { isSelected, unSelectCue, selectCue, commitTextEdits, editCueText, 
   mergeCues, splitCues, getCue, unselectAll,
-  deleteCues} from "./model.js"
+  deleteCues,
+  srtData} from "./model.js"
 
 let mouseUpHandler;
 let mouseMoveHandler;
@@ -13,6 +14,8 @@ function onKeyDown(event) {
     mergeCues();
   } else if (event.key === 'Delete'){
     deleteCues();
+  } else if (event.key === 'ArrowRight'){
+    seekUnmatched();
   } else {
     return;
   }
@@ -152,4 +155,12 @@ function handleDoubleClick(event, clickedCue) {
   textE.contentEditable = true;
   clickedCue.removeEventListener('mousedown', dblClick);
   clickedCue.addEventListener('mousedown', (e) => { e.stopPropagation() })
+}
+
+function seekUnmatched(){
+  let unmatched = srtData.filter(e => e.matched === false);
+  if(unmatched.length === 0) return
+  let scrollTo = unmatched[0].id;
+  document.getElementById(scrollTo).scrollIntoView({behavior: "smooth", 
+    block: "center",inline: "center"});
 }

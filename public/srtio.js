@@ -1,6 +1,8 @@
 import { addEvents } from "./events.js"
 import { renderSrt } from "./render.js";
 import { srtData, alignCues, Cue } from "./model.js";
+const brPattern = new RegExp("(<br\\s*\\/?>)+|(<br\\s*\\/?>)+", "g");
+
 
 //get file text from file element
 async function getStrText(file) {
@@ -48,8 +50,8 @@ async function srtToCueJSON(path, side) {
 
 async function jsonToCue(cueJson) {
     srtData.splice(0);
-    for(let i=0; i<cueJson.length; i++){
-        let {side, text, textLength, startTime, endTime, duration, cps, matched, id} = cueJson[i];
+    for (let i = 0; i < cueJson.length; i++) {
+        let { side, text, textLength, startTime, endTime, duration, cps, matched, id } = cueJson[i];
         let cue = new Cue(startTime, endTime, text, side, id);
         cue.matched = matched;
         cue.refreshStats();
@@ -75,4 +77,53 @@ function downloadFile(content, filename, type = "text/plain") {
 }
 
 
-export {srtToCueJSON, downloadFile, jsonToCue}; 
+function createSrt() {
+    let unmatched = srtData.filter(e => e.matched === false);
+    if (unmatched.length > 0) return false;
+    let combined = combineCues(-12000);
+    combined = combined.sort((a, b) => { return a.startTime - b.startTime });
+    return srtString(combined)
+}
+
+function srtString(merged){
+    let outputString = '';
+    let cueNum = 1;
+    for (let i = 0; i < merged.length; i++){
+        outputString += cueNum;
+        outputString += '\r\n';
+        outputString += merged[i].toString();
+        outputString += '\r\n\r\n';
+        cueNum++;
+    }
+    return outputString;
+}
+
+function wrapItalics(text){
+    return '<i>' + text + '</i>'
+}
+
+function combineCues(offset = 0) {
+    let output = []
+    let leftArr = srtData.filter(e => e.side === 'left');
+    let rightArr = srtData.filter(e => e.side === 'right');
+    for (let i = 0; i < rightArr.length; i++) {
+        let current = rightArr[i];
+        let newText;
+        if (current.hasNeighbor()) {
+            newText = current.text + '<br>' + wrapItalics(current.getNeighbor().text);
+        } else {
+            newText = current.text;
+        }
+        output.push(new Cue(current.startTime + offset, current.endTime + offset, newText, 'merged'))
+    }
+
+    for (let i = 0; i < leftArr.length; i++) {
+        let current = leftArr[i];
+        if (!current.hasNeighbor()) {
+            output.push(new Cue(current.startTime + offset, current.endTime + offset, wrapItalics(current.text), 'merged'))
+        }
+    }
+    return output;
+}
+
+export { srtToCueJSON, downloadFile, jsonToCue, createSrt }; 

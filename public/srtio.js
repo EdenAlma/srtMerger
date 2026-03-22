@@ -25,12 +25,13 @@ function parseSrtTime(time) {
 
 async function srtToCueJSON(path, side) {
 
-    const fileString = await getStrText(path);
-    const srtArray = fileString.split('\r\n\r\n')
+    let fileString = await getStrText(path);
+    fileString = fileString.trim().replaceAll('\r\n', '\n');
+    const srtArray = fileString.split('\n\n')
 
     const mapped = srtArray.map((record) => {
 
-        let block = record.split('\r\n')
+        let block = record.split('\n')
         let i = 2
         let rawText = '';
         while (block[i]) {
@@ -80,7 +81,7 @@ function downloadFile(content, filename, type = "text/plain") {
 function createSrt() {
     let unmatched = srtData.filter(e => e.matched === false);
     if (unmatched.length > 0) return false;
-    let combined = combineCues(-12000);
+    let combined = combineCues();
     combined = combined.sort((a, b) => { return a.startTime - b.startTime });
     return srtString(combined)
 }

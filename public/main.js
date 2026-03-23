@@ -15,11 +15,13 @@ loadSrt.addEventListener('click', async () => {
   //get left file -> json
   srtFileLeft.click();
   let leftFile = await waitForFile(srtFileLeft);
-  let leftCues = await srtToCueJSON(leftFile, 'left')
+  let leftOffset = parseInt(prompt("Enter offset for this file (ms)", 0))
+  let leftCues = await srtToCueJSON(leftFile, 'left', leftOffset)
   //get right file -> json
   srtFileRight.click();
   let rightFile = await waitForFile(srtFileRight);
-  let rightCues = await srtToCueJSON(rightFile, 'right')
+  let rightOffset = parseInt(prompt("Enter offset for this file (ms)", 0))
+  let rightCues = await srtToCueJSON(rightFile, 'right', rightOffset)
   //combine into a single array and push into srtData
   let comboArray = leftCues.concat(rightCues);
   comboArray.sort((a, b) => { return a.startTime - b.startTime })

@@ -23,7 +23,7 @@ function parseSrtTime(time) {
 }
 
 
-async function srtToCueJSON(path, side) {
+async function srtToCueJSON(path, side, offset=0) {
 
     let fileString = await getStrText(path);
     fileString = fileString.trim().replaceAll('\r\n', '\n');
@@ -40,12 +40,13 @@ async function srtToCueJSON(path, side) {
         }
 
         let text = rawText;
-        let start = parseSrtTime(block[1].split(' --> ')[0])
-        let end = parseSrtTime(block[1].split(' --> ')[1])
+        let start = parseSrtTime(block[1].split(' --> ')[0]) + offset;
+        let end = parseSrtTime(block[1].split(' --> ')[1]) + offset;
+        if(start < 0 || end < 0) return
         return new Cue(start, end, text, side);
     })
 
-    return mapped;
+    return mapped.filter(e => e != undefined);
 }
 
 

@@ -13,6 +13,22 @@ const nbspPattern = new RegExp("&nbsp;", "gi");
 export { thresh, srtData, selectedElements, cps, cpl, pixelMultiplier };
 
 
+
+function scaleCues(side, factor) {
+    let cuesToScale = srtData.filter(e => e.side === side);
+    for (let i = 0; i < cuesToScale.length; i++) {
+        cuesToScale[i].scaleCue(factor)
+    }
+}
+
+
+function shiftCues(side, shift) {
+    let cuesToShift = srtData.filter(e => e.side === side);
+    for (let i = 0; i < cuesToShift.length; i++) {
+        cuesToShift[i].shiftCue(shift);
+    }
+}
+
 /**
  * model method
  */
@@ -155,9 +171,9 @@ class Cue {
 
     constructor(start, end, text, side, id) {
         this.side = side
-        if(side === 'merged'){
+        if (side === 'merged') {
             this.text = text;
-        }else{
+        } else {
             this.text = text.replaceAll(tagPattern, '');
         }
         this.textLength = this.text.length;
@@ -201,7 +217,7 @@ class Cue {
         updateCueRender(this)
     }
 
-    shiftCue(shiftAmount) {
+    shiftCue(shiftAmount, render = true) {
 
         let { min, max } = this.getLimits();
 
@@ -215,8 +231,10 @@ class Cue {
             this.endTime = newEnd;
             this.duration = newDuration;
         }
-        this.alignCue();
-        updateCueRender(this)
+        if (render) {
+            this.alignCue();
+            updateCueRender(this)
+        }
     }
 
     getLimits() {
@@ -395,11 +413,18 @@ class Cue {
         output += this.text.replaceAll(brPattern, '\r\n');
         return output;
     }
+
+    scaleCue(factor) {
+        this.startTime = this.startTime * factor;
+        this.endTime = this.endTime * factor;
+        this.refreshStats();
+    }
+
 }
 
 
 export {
     isSelected, selectCue, unSelectCue, editCueText, commitTextEdits,
     mergeCues, splitCues, alignCues, Cue, getCue, unselectAll, updateProgress,
-    deleteCues
+    deleteCues, scaleCues, shiftCues
 }

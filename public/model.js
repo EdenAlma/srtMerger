@@ -16,17 +16,34 @@ export { thresh, srtData, selectedElements, cps, cpl, pixelMultiplier };
 
 function scaleCues(side, factor) {
     let cuesToScale = srtData.filter(e => e.side === side);
-    for (let i = 0; i < cuesToScale.length; i++) {
-        cuesToScale[i].scaleCue(factor)
+    if (factor > 1) {
+        let i = cuesToScale.length - 1;
+        for (; i >= 0; i--) {
+            cuesToScale[i].scaleCue(factor);
+        }
+    } else {
+        for (let i = 0; i < cuesToScale.length; i++) {
+            cuesToScale[i].scaleCue(factor);
+        }
     }
+
 }
 
 
 function shiftCues(side, shift) {
     let cuesToShift = srtData.filter(e => e.side === side);
-    for (let i = 0; i < cuesToShift.length; i++) {
-        cuesToShift[i].shiftCue(shift);
+
+    if (shift > 0) {
+        let i = cuesToShift.length - 1;
+        for (; i >= 0; i--) {
+            cuesToShift[i].shiftCue(shift, false);
+        }
+    } else {
+        for (let i = 0; i < cuesToShift.length; i++) {
+            cuesToShift[i].shiftCue(shift, false);
+        }
     }
+
 }
 
 /**
@@ -40,7 +57,8 @@ function commitTextEdits() {
         let updatedText = textSpan.innerHTML.replaceAll(brPatternTrail, '');
         updatedText = updatedText.replaceAll(nbspPattern, ' ');
         editedCue.text = updatedText.trim();
-        updateCueRender(editedCue);
+        deleteCueRender(editedCue.id)
+        renderCue(editedCue);
         editedElements.splice(i, 1);
     }
 }

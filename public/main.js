@@ -19,10 +19,8 @@ loadSrt.addEventListener('click', async () => {
   srtFiles.click();
   let files = await waitForFiles(srtFiles);
   if (files.length != 2) console.error('Two files must be selected!');
-  let leftOffset = parseInt(prompt("Offset (ms) for " + files[0].name, 0));
-  let rightOffset = parseInt(prompt("Offset (ms) for " + files[1].name, 0));
-  let file1 = await srtToCueJSON(files[0], 'left', leftOffset)
-  let file2 = await srtToCueJSON(files[1], 'right', rightOffset)
+  let file1 = await srtToCueJSON(files[0], 'left')
+  let file2 = await srtToCueJSON(files[1], 'right')
   //combine into a single array and push into srtData
   let comboArray = file1.concat(file2);
   comboArray.sort((a, b) => { return a.startTime - b.startTime })
@@ -67,7 +65,7 @@ loadJson.addEventListener('click', async () => {
     // Wait for the user to select a file
     const jsonFile = await waitForFiles(jsonFileInput);
     // Read the file as text
-    const text = await jsonFile.text(); // modern File API supports .text()
+    const text = await jsonFile[0].text(); // modern File API supports .text()
     // Parse JSON
     const jsonObj = JSON.parse(text);
     jsonToCue(jsonObj);
@@ -88,7 +86,7 @@ saveSrt.addEventListener('click', async () => {
 scaleLeft.addEventListener('click', () => {
   let factor = parseFloat(prompt('Input scaling factor', 0.0));
   scaleCues('left', factor)
-  renderSrt(srtData);
+  renderSrt(srtData, true);
   splitAndAlign();
 }
 )
@@ -96,7 +94,7 @@ scaleLeft.addEventListener('click', () => {
 scaleRight.addEventListener('click', () => {
   let factor = parseFloat(prompt('Input scaling factor', 0.0));
   scaleCues('right', factor)
-  renderSrt(srtData);
+  renderSrt(srtData, true);
   splitAndAlign();
 }
 )
@@ -104,7 +102,7 @@ scaleRight.addEventListener('click', () => {
 shiftLeft.addEventListener('click', () => {
   let shift = parseInt(prompt('Input shift amount (ms)', 0));
   shiftCues('left', shift)
-  renderSrt(srtData);
+  renderSrt(srtData, true);
   splitAndAlign();
 }
 )
@@ -112,7 +110,7 @@ shiftLeft.addEventListener('click', () => {
 shiftRight.addEventListener('click', () => {
   let shift = parseInt(prompt('Input shift amount (ms)', 0));
   shiftCues('right', shift)
-  renderSrt(srtData);
+  renderSrt(srtData, true);
   splitAndAlign();
 }
 )

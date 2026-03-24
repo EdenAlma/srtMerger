@@ -45,7 +45,7 @@ function onMouseDown(event) {
 }
 
 function onMouseUp(event, initialClicked, initialYPosition) {
-  let clickedCueElement = event.target.closest('.cue');
+  let clickedCueElement = initialClicked.closest('.cue');
 
   if (event.clientY === initialYPosition) {
     handleSingleClick(initialClicked)
@@ -145,7 +145,7 @@ function updateCueElementSize(clickedElement, startTop, startHeight, shift) {
   }
 }
 
-
+let blockerFunction = (e) => { e.stopPropagation() }
 function handleDoubleClick(event, clickedCue) {
   window.removeEventListener('keydown', onKeyDown);
   editCueText(clickedCue.id);
@@ -154,7 +154,7 @@ function handleDoubleClick(event, clickedCue) {
   textE.classList.add('editing');
   textE.contentEditable = true;
   clickedCue.removeEventListener('mousedown', dblClick);
-  clickedCue.addEventListener('mousedown', (e) => { e.stopPropagation() })
+  clickedCue.addEventListener('mousedown', blockerFunction)
 }
 
 function seekUnmatched(){

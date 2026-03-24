@@ -1,13 +1,17 @@
 import { pixelMultiplier, cps, cpl } from "./model.js";
 
-function renderSrt(cues) {
+function renderSrt(cues, update=false) {
 
     for (let i = 0; i < cues.length; i++) {
-        renderCue(cues[i]);
+        if(!update)
+            renderCue(cues[i]);
+        else{
+            updateCueRender(cues[i]);
+        }
     }
 
-    //addPostRenderEvents();
 }
+
 
 
 function renderCue(cue) {
@@ -54,11 +58,35 @@ function renderCue(cue) {
 
 
 
+
+
 function updateCueRender(cue) {
     cue.refreshStats();
-    const div = document.getElementById(cue.id)
-    div.parentNode.removeChild(div);
-    renderCue(cue);
+    let div = document.getElementById(cue.id);
+    if (!div) return;
+    div.style.top = cue.startTime / pixelMultiplier + 'px';
+    div.style.height = cue.duration / pixelMultiplier + 'px';
+    let textElement = div.querySelector('.cue-text');
+    textElement.innerHTML = cue.text;
+    if (cue.matched) {
+        div.classList.add('matched')
+    } else {
+        div.classList.remove('matched')
+    }
+
+    if (cue.cps > cps.value) {
+        div.classList.add('cps-flag')
+    } else {
+        div.classList.remove('cps-flag')
+    }
+
+    if (cue.textLength > cpl.value) {
+        div.classList.add('cpl-flag')
+    } else {
+        div.classList.remove('cpl-flag')
+    }
+
+    div.classList.remove('selected');
 }
 
 

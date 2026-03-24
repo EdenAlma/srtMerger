@@ -27,6 +27,7 @@ function scaleCues(side, factor) {
         }
     }
 
+
 }
 
 
@@ -111,7 +112,6 @@ function splitCues() {
         selectedElements[i].split();
         selectedElements.splice(i, 1);
     }
-    srtData.sort((a, b) => { return a.startTime - b.startTime })
 }
 
 /**
@@ -132,7 +132,6 @@ function mergeCues() {
     newCue.duration = newCue.endTime - newCue.startTime;
     deleteCueRender(selectedElements[1].id);
     srtData.splice(srtData.findIndex(e => e.id === selectedElements[1].id), 1)
-    srtData.sort((a, b) => { return a.startTime - b.startTime })
     selectedElements.splice(0);
     newCue.alignCue();
     updateCueRender(newCue);
@@ -279,36 +278,56 @@ class Cue {
     }
 
     getPrev(same) {
-        let current = srtData.findIndex(e => e === this)
-        let prev = current - 1;
+
+        let min = Infinity;
+        let prev;
         if (same) {
-            while (srtData[prev] && srtData[prev].side != this.side) {
-                prev--;
+            for (let i = 0; i < srtData.length; i++) {
+                let test = this.startTime - srtData[i].startTime;
+                if (test <= 0 || srtData[i].side != this.side || test > min) continue;
+                else if (test < min) {
+                    min = test;
+                    prev = srtData[i];
+                }
             }
         } else {
-            while (srtData[prev] && srtData[prev].side === this.side) {
-                prev--;
+            for (let i = 0; i < srtData.length; i++) {
+                let test = this.startTime - srtData[i].startTime;
+                if (test <= 0 || srtData[i].side === this.side || test > min) continue;
+                else if (test < min) {
+                    min = test;
+                    prev = srtData[i];
+                }
             }
         }
 
-
-        return srtData[prev]
+        return prev
     }
 
     getNext(same) {
-        let current = srtData.findIndex(e => e === this)
-        let next = current + 1;
+        let min = Infinity;
+        let next;
         if (same) {
-            while (srtData[next] && srtData[next].side != this.side) {
-                next++;
+            for (let i = 0; i < srtData.length; i++) {
+                let test = srtData[i].startTime - this.startTime;
+                if (test <= 0 || srtData[i].side != this.side || test > min) continue;
+                else if (test < min) {
+                    min = test;
+                    next = srtData[i];
+                }
             }
         } else {
-            while (srtData[next] && srtData[next].side === this.side) {
-                next++;
+            for (let i = 0; i < srtData.length; i++) {
+                let test = srtData[i].startTime - this.startTime;
+                if (test <= 0 || srtData[i].side === this.side || test > min) continue;
+                else if (test < min) {
+                    min = test;
+                    next = srtData[i];
+                }
             }
         }
 
-        return srtData[next]
+        return next
     }
 
     alignCue() {
@@ -364,8 +383,6 @@ class Cue {
 
         if (index > -1) srtData[index] = this; //if it exists already, replace it
         else srtData.push(this)
-
-        srtData.sort((a, b) => { return a.startTime - b.startTime })
     }
 
 

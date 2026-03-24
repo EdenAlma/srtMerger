@@ -69,7 +69,6 @@ loadJson.addEventListener('click', async () => {
     // Parse JSON
     const jsonObj = JSON.parse(text);
     jsonToCue(jsonObj);
-    srtData.sort((a, b) => { return a.startTime - b.startTime })
     renderSrt(srtData);
     updateProgress();
     addEvents();

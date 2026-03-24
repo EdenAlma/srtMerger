@@ -42,8 +42,8 @@ async function srtToCueJSON(path, side, offset=0) {
         let text = rawText;
         let start = parseSrtTime(block[1].split(' --> ')[0]) + offset;
         let end = parseSrtTime(block[1].split(' --> ')[1]) + offset;
-        if(start < 0 || end < 0) return
-        return new Cue(start, end, text, side);
+        if(start < 0 || end < 0) return undefined
+        else return new Cue(start, end, text, side);
     })
 
     return mapped.filter(e => e != undefined);

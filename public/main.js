@@ -7,23 +7,20 @@ const saveJson = document.getElementById('save-json');
 const loadJson = document.getElementById('load-json');
 const saveSrt = document.getElementById('save-srt');
 const loadSrt = document.getElementById('load-srt');
-const srtFileLeft = document.getElementById('srt-file-input-left');
-const srtFileRight = document.getElementById('srt-file-input-right');
+const srtFiles = document.getElementById('srt-file-input');
 const jsonFileInput = document.getElementById('json-file-input');
 
 loadSrt.addEventListener('click', async () => {
   //get left file -> json
-  srtFileLeft.click();
-  let leftFile = await waitForFile(srtFileLeft);
-  let leftOffset = parseInt(prompt("Enter offset for this file (ms)", 0))
-  let leftCues = await srtToCueJSON(leftFile, 'left', leftOffset)
-  //get right file -> json
-  srtFileRight.click();
-  let rightFile = await waitForFile(srtFileRight);
-  let rightOffset = parseInt(prompt("Enter offset for this file (ms)", 0))
-  let rightCues = await srtToCueJSON(rightFile, 'right', rightOffset)
+  srtFiles.click();
+  let files = await waitForFiles(srtFiles);
+  if(files.length != 2) console.error('Two files must be selected!');
+  let leftOffset = parseInt(prompt("Offset (ms) for " + files[0].name, 0));
+  let rightOffset = parseInt(prompt("Offset (ms) for " + files[1].name, 0));
+  let file1 = await srtToCueJSON(files[0], 'left', leftOffset)
+  let file2 = await srtToCueJSON(files[1], 'right', rightOffset)
   //combine into a single array and push into srtData
-  let comboArray = leftCues.concat(rightCues);
+  let comboArray = file1.concat(file2);
   comboArray.sort((a, b) => { return a.startTime - b.startTime })
   srtData.push(...comboArray)
   renderSrt(srtData);
@@ -31,11 +28,11 @@ loadSrt.addEventListener('click', async () => {
   addEvents();
 })
 
-async function waitForFile(fileElement) {
+async function waitForFiles(fileElement) {
   return new Promise(resolve => {
     const handler = () => {
       fileElement.removeEventListener('change', handler);
-      resolve(fileElement.files[0]);
+      resolve(fileElement.files);
     };
     fileElement.addEventListener('change', handler);
   });
@@ -64,7 +61,7 @@ loadJson.addEventListener('click', async () => {
   jsonFileInput.click();
   try {
     // Wait for the user to select a file
-    const jsonFile = await waitForFile(jsonFileInput);
+    const jsonFile = await waitForFiles(jsonFileInput);
     // Read the file as text
     const text = await jsonFile.text(); // modern File API supports .text()
     // Parse JSON

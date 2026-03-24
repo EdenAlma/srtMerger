@@ -111,6 +111,7 @@ function splitCues() {
         selectedElements[i].split();
         selectedElements.splice(i, 1);
     }
+    srtData.sort((a, b) => { return a.startTime - b.startTime })
 }
 
 /**
@@ -131,6 +132,7 @@ function mergeCues() {
     newCue.duration = newCue.endTime - newCue.startTime;
     deleteCueRender(selectedElements[1].id);
     srtData.splice(srtData.findIndex(e => e.id === selectedElements[1].id), 1)
+    srtData.sort((a, b) => { return a.startTime - b.startTime })
     selectedElements.splice(0);
     newCue.alignCue();
     updateCueRender(newCue);

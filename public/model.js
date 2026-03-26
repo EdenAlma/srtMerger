@@ -33,7 +33,7 @@ function scaleCues(side, factor) {
 
 function shiftCues(side, shift) {
     let cuesToShift = srtData.filter(e => e.side === side);
-
+    cuesToShift.sort((a, b) => { return a.startTime - b.startTime })
     if (shift > 0) {
         let i = cuesToShift.length - 1;
         for (; i >= 0; i--) {
@@ -171,6 +171,19 @@ function deleteCues() {
     }
 }
 
+function isLegalMultiShift(){
+    selectedElements.sort((a, b) => { return a.startTime - b.startTime })
+    if(selectedElements.length == 0) return false;
+    let test = selectedElements[0]
+    let sameSide = selectedElements.filter(e => e.side != test.side);
+    if(sameSide.length > 0) return false;
+    for(let i = 1; i<selectedElements.length; i++){
+        if (selectedElements[i] != test.getNext(true)) return false;
+        test = selectedElements[i]
+    }
+    return true;
+}
+
 function msToSrtTime(ms) {
     const hours = Math.floor(ms / 3600000);
     const minutes = Math.floor((ms % 3600000) / 60000);
@@ -219,7 +232,7 @@ class Cue {
             this.startTime = newStart;
         }
         this.alignCue();
-        updateCueRender(this)
+        updateCueRender(this);
     }
 
     resizeBottom(shiftAmount) {
@@ -236,7 +249,7 @@ class Cue {
         updateCueRender(this)
     }
 
-    shiftCue(shiftAmount, render = true) {
+    shiftCue(shiftAmount, render = true, align = true) {
 
         let { min, max } = this.getLimits();
 
@@ -250,10 +263,9 @@ class Cue {
             this.endTime = newEnd;
             this.duration = newDuration;
         }
-        if (render) {
-            this.alignCue();
-            updateCueRender(this)
-        }
+        
+        if(align) this.alignCue();
+        if(render) updateCueRender(this);
     }
 
     getLimits() {
@@ -310,7 +322,7 @@ class Cue {
         if (same) {
             for (let i = 0; i < srtData.length; i++) {
                 let test = srtData[i].startTime - this.startTime;
-                if (test <= 0 || srtData[i].side != this.side || test > min) continue;
+                if (test < 0 || srtData[i].side != this.side || test > min || this === srtData[i]) continue;
                 else if (test < min) {
                     min = test;
                     next = srtData[i];
@@ -319,7 +331,7 @@ class Cue {
         } else {
             for (let i = 0; i < srtData.length; i++) {
                 let test = srtData[i].startTime - this.startTime;
-                if (test <= 0 || srtData[i].side === this.side || test > min) continue;
+                if (test < 0 || srtData[i].side === this.side || test > min) continue;
                 else if (test < min) {
                     min = test;
                     next = srtData[i];
@@ -463,5 +475,5 @@ class Cue {
 export {
     isSelected, selectCue, unSelectCue, editCueText, commitTextEdits,
     mergeCues, splitCues, alignCues, Cue, getCue, unselectAll, updateProgress,
-    deleteCues, scaleCues, shiftCues
+    deleteCues, scaleCues, shiftCues, isLegalMultiShift
 }

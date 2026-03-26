@@ -86,7 +86,6 @@ function updateCueRender(cue) {
         div.classList.remove('cpl-flag')
     }
 
-    div.classList.remove('selected');
 }
 
 

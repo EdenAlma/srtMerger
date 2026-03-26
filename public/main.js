@@ -26,7 +26,7 @@ loadSrt.addEventListener('click', async () => {
   comboArray.sort((a, b) => { return a.startTime - b.startTime })
   srtData.push(...comboArray)
   renderSrt(srtData);
-  splitAndAlign();
+  //splitAndAlign();
   addEvents();
 })
 

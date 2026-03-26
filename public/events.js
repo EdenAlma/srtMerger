@@ -230,8 +230,8 @@ function handleDoubleClick(event, clickedCue) {
 function seekUnmatched() {
   let unmatched = srtData.filter(e => e.matched === false);
   if (unmatched.length === 0) return
-  let scrollTo = unmatched[0].id;
-  document.getElementById(scrollTo).scrollIntoView({
+  let scrollTo = unmatched[parseInt(Math.random()*unmatched.length)];
+  document.getElementById(scrollTo.id).scrollIntoView({
     behavior: "smooth",
     block: "center", inline: "center"
   });

@@ -79,10 +79,10 @@ function downloadFile(content, filename, type = "text/plain") {
 }
 
 
-function createSrt() {
+function createSrt(offset, top) {
     let unmatched = srtData.filter(e => e.matched === false);
     if (unmatched.length > 0) return false;
-    let combined = combineCues();
+    let combined = combineCues(offset, top);
     combined = combined.sort((a, b) => { return a.startTime - b.startTime });
     return srtString(combined)
 }
@@ -104,12 +104,12 @@ function wrapItalics(text){
     return '<i>' + text + '</i>'
 }
 
-function combineCues(offset = 0) {
+function combineCues(offset = 0, top = 'right') {
     let output = []
-    let leftArr = srtData.filter(e => e.side === 'left');
-    let rightArr = srtData.filter(e => e.side === 'right');
-    for (let i = 0; i < rightArr.length; i++) {
-        let current = rightArr[i];
+    let topArr = srtData.filter(e => e.side === top);
+    let bottomArr = srtData.filter(e => e.side != top);
+    for (let i = 0; i < topArr.length; i++) {
+        let current = topArr[i];
         let newText;
         if (current.hasNeighbor()) {
             newText = current.text + '<br>' + wrapItalics(current.getNeighbor().text);
@@ -119,8 +119,8 @@ function combineCues(offset = 0) {
         output.push(new Cue(current.startTime + offset, current.endTime + offset, newText, 'merged'))
     }
 
-    for (let i = 0; i < leftArr.length; i++) {
-        let current = leftArr[i];
+    for (let i = 0; i < bottomArr.length; i++) {
+        let current = bottomArr[i];
         if (!current.hasNeighbor()) {
             output.push(new Cue(current.startTime + offset, current.endTime + offset, wrapItalics(current.text), 'merged'))
         }

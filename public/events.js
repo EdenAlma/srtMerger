@@ -6,7 +6,8 @@ import {
   isLegalMultiShift,
   selectedElements,
   thresh,
-  pixelMultiplier
+  pixelMultiplier,
+  alignCues
 } from "./model.js"
 
 let mouseUpHandler;
@@ -18,6 +19,8 @@ function onKeyDown(event) {
     splitCues();
   } else if (event.key === 'm') {
     mergeCues();
+  } else if (event.key === 'a') {
+    alignCues();
   } else if (event.key === 'Delete') {
     deleteCues();
   } else if (event.key === 'ArrowRight') {
@@ -38,7 +41,7 @@ function onKeyDown(event) {
 }
 
 
-function onKeyUp(event){
+function onKeyUp(event) {
   if (event.key === 'Control') {
     window.removeEventListener('mousedown', onMouseDownCtrl)
     window.removeEventListener('keyup', onKeyUp)
@@ -90,7 +93,7 @@ function onMouseDownCtrl(event) {
         document.getElementById(begin.id).classList.add('selected');
       }
     } else {
-     let begin = firstSelect;
+      let begin = firstSelect;
       while (begin != lastSelect) {
         begin = begin.getPrev(true);
         selectCue(begin.id);
@@ -230,7 +233,7 @@ function handleDoubleClick(event, clickedCue) {
 function seekUnmatched() {
   let unmatched = srtData.filter(e => e.matched === false);
   if (unmatched.length === 0) return
-  let scrollTo = unmatched[parseInt(Math.random()*unmatched.length)];
+  let scrollTo = unmatched[parseInt(Math.random() * unmatched.length)];
   document.getElementById(scrollTo.id).scrollIntoView({
     behavior: "smooth",
     block: "center", inline: "center"

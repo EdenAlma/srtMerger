@@ -79,8 +79,11 @@ loadJson.addEventListener('click', async () => {
 
 saveSrt.addEventListener('click', async () => {
   let fileName = prompt("Enter file name (without extension):", "data");
+  let topRight = confirm("Right side to appear on top?")
+  let top = 'right';
+  if(!topRight) top = 'left';
   if (!fileName) fileName = "data"; // fallback if user cancels or enters nothing
-  downloadFile(createSrt(), fileName + '.srt', "text/srt")
+  downloadFile(createSrt(0,top), fileName + '.srt', "text/srt")
 })
 
 scaleLeft.addEventListener('click', () => {

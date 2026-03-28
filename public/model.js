@@ -37,11 +37,11 @@ function shiftCues(side, shift) {
     if (shift > 0) {
         let i = cuesToShift.length - 1;
         for (; i >= 0; i--) {
-            cuesToShift[i].shiftCue(shift, false);
+            cuesToShift[i].shiftCue(shift, false, false);
         }
     } else {
         for (let i = 0; i < cuesToShift.length; i++) {
-            cuesToShift[i].shiftCue(shift, false);
+            cuesToShift[i].shiftCue(shift, false, false);
         }
     }
 

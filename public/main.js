@@ -1,6 +1,6 @@
 import { addEvents } from "./events.js"
 import { renderSrt } from "./render.js";
-import { srtData, alignCues, updateProgress, scaleCues, shiftCues } from "./model.js";
+import { srtData, alignCues, updateProgress, scaleCues, shiftCues, pixelMultiplier } from "./model.js";
 import { srtToCueJSON, downloadFile, jsonToCue, createSrt } from "./srtio.js";
 
 const saveJson = document.getElementById('save-json');
@@ -104,15 +104,15 @@ scaleRight.addEventListener('click', () => {
 
 shiftLeft.addEventListener('click', () => {
   let shift = parseInt(prompt('Input shift amount (ms)', 0));
-  shiftCues('left', shift)
+  shiftCues('left', shift/pixelMultiplier)
   renderSrt(srtData, true);
-  splitAndAlign();
+  //splitAndAlign();
 }
 )
 
 shiftRight.addEventListener('click', () => {
   let shift = parseInt(prompt('Input shift amount (ms)', 0));
-  shiftCues('right', shift)
+  shiftCues('right', shift/pixelMultiplier)
   renderSrt(srtData, true);
   splitAndAlign();
 }

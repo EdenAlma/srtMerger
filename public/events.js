@@ -63,10 +63,12 @@ function onMouseDown(event) {
     const cueHeight = parseInt(clickedCue.style.height);
     mouseUpHandler = (event) => onMouseUp(event, clickedElement, clickYPosition)
     mouseMoveHandler = (event) => onMouseMove(event, clickedElement, clickYPosition, cueTop, cueHeight)
-  } else {
+  } else if (clickedElement.parentElement.id === 'srtContainer') {
     commitTextEdits(); //commit text edits (if any)
     unselectAll(); //unselect cues
     window.addEventListener('keydown', onKeyDown) //will this add multiple event listeners? -> no
+    return;
+  } else {
     return;
   }
 
@@ -235,7 +237,6 @@ function seekUnmatched() {
   if (unmatched.length === 0) return
   let scrollTo = unmatched[parseInt(Math.random() * unmatched.length)];
   document.getElementById(scrollTo.id).scrollIntoView({
-    behavior: "smooth",
     block: "center", inline: "center"
   });
 }
@@ -249,3 +250,5 @@ function multiShift(key) {
   }
   return true;
 }
+
+

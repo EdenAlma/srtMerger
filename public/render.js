@@ -1,15 +1,15 @@
 import { pixelMultiplier, cps, cpl } from "./model.js";
 
-function renderSrt(cues, update=false) {
+function renderSrt(cues, update = false) {
 
     for (let i = 0; i < cues.length; i++) {
-        if(!update)
+        if (!update)
             renderCue(cues[i]);
-        else{
+        else {
             updateCueRender(cues[i]);
         }
     }
-
+    updateBackgroundHeight(cues);
 }
 
 
@@ -107,6 +107,15 @@ function unselectAllRender() {
         selectedElements[0].classList.remove('selected');
 }
 
+function updateBackgroundHeight(srtData) {
+    if (srtData.length == 0) return;
+    let background = document.getElementById("srtContainer");
+    const maxObj = srtData.reduce((max, item) => {
+        return item.endTime > max.endTime ? item : max;
+    }, srtData[0]);
+    let newHeight = maxObj.endTime / pixelMultiplier;
+    background.style.height = newHeight + 'px';
+}
 
 
 
@@ -114,3 +123,4 @@ export {
     renderSrt, updateCueRender, renderCue, deleteCueRender, updateProgressRender
     , unselectAllRender
 };
+
